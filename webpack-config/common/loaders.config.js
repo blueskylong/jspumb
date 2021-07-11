@@ -5,8 +5,9 @@ module.exports = {
 
     rules: [
         {
-            test: /\.tsx?$/,
-            use: 'ts-loader'
+            test: /\.ts$/,
+            loader: 'ts-loader',
+            options:{allowTsInNodeModules:true}
         },
         // {
         //     test: require.resolve('jquery'),
