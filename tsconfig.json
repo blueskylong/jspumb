@@ -5,6 +5,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": true,
+    "outDir": "./dist",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": false,
@@ -16,6 +17,7 @@
   },
   "compileOnSave": true,
   "exclude": [
-    "node_modules/*"
+    "node_modules/*",
+    ".idea/*"
   ]
 }
