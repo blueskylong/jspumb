@@ -380,7 +380,6 @@ export class LocalRenderProvider extends ServerRenderProvider {
         new Promise((resolve => {
             return this.viewer;
         }));
-        // this.viewer = await UiService.getSchemaViewer(blockId) as any;
     }
 
     /**
