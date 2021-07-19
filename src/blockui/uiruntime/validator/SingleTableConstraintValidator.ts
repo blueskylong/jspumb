@@ -14,25 +14,28 @@ export class SingleTableConstraintValidator implements IValidator {
     private lstConstraint: Array<Constraint>;
     private formulaParse: FormulaParse;
 
-    validateField(fieldName, value, row, viewer: BlockViewer): string {
+     validateField(fieldName, value, row, viewer: BlockViewer): string {
+        return ""
+    }
+
+    async doValide(row, viewer: BlockViewer) {
         for (let cons of this.lstConstraint) {
             let filter = cons.getConstraintDto().filter;
             let expression = cons.getConstraintDto().expression;
             //先计算条件是不是符合,再计算表达式是不是符合
             if (filter != null) {
-                let valueExp = this.formulaParse.transToValue(filter, row, null, this.formulaParse);
+                let valueExp = await this.formulaParse.transToValue(filter, viewer.findTables()[0].getTableDto().tableId, row, null, this.formulaParse
+                ,{});
                 if (!eval(valueExp)) {
                     continue;
                 }
             }
             //计算表达式
-            let valueExp = this.formulaParse.transToValue(expression, row, null, this.formulaParse);
+            let valueExp = await this.formulaParse.transToValue(expression, row, viewer.findTables()[0].getTableDto().tableId, null, this.formulaParse);
             if (!eval(valueExp)) {
                 return cons.getConstraintDto().memo || "检查不通过";
             }
         }
-        return null;
-
     }
 
     /**

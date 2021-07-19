@@ -1,7 +1,11 @@
 import BaseUI from "../../uidesign/view/BaseUI";
 import "./template/BorderLayout.css";
+import {Alert} from "../../uidesign/view/JQueryComponent/Alert";
+import {GeneralEventListener} from "../event/GeneralEventListener";
 
 export class BorderLayout<T extends BorderLayoutProperty> extends BaseUI<T> {
+
+    static EVENT_RESIZE = "resize";
     static center = "center";
     static north = "north";
     static east = "east";
@@ -23,6 +27,14 @@ export class BorderLayout<T extends BorderLayoutProperty> extends BaseUI<T> {
         if (this.hasOwnProperty(uiProperty)) {
             this[uiProperty] = baseUi;
         }
+    }
+
+    addResizeListenser(listener: GeneralEventListener) {
+        this.addListener(BorderLayout.EVENT_RESIZE, listener);
+    }
+
+    removeResizeListenser(listener: GeneralEventListener) {
+        this.removeListener(BorderLayout.EVENT_RESIZE, listener);
     }
 
     /**
@@ -68,13 +80,43 @@ export class BorderLayout<T extends BorderLayoutProperty> extends BaseUI<T> {
         container.append(this.centerUi.getViewUI());
 
         this.$element.find(".split-pane")['splitPane']();
+        this.$element.find(".split-pane").on("resize", () => {
+            this.fireEvent(BorderLayout.EVENT_RESIZE);
+        });
     }
 
     afterComponentAssemble(): void {
-
         this.fireReadyEvent();
+
     }
 
+
+    protected initEvent() {
+
+        this.addResizeListenser({
+            handleEvent: (eventType: string, data: any, source: any, extObject?: any) => {
+                this.resize();
+            }
+        })
+    }
+
+    resize() {
+        if (this.eastUi) {
+            this.eastUi.resize();
+        }
+        if (this.westUi) {
+            this.westUi.resize();
+        }
+        if (this.northUi) {
+            this.northUi.resize();
+        }
+        if (this.centerUi) {
+            this.centerUi.resize();
+        }
+        if (this.southUi) {
+            this.southUi.resize();
+        }
+    }
 
     private createHorizontalSplit(topClass, bottomClass, parent: JQuery, bottomHeight?, topHeight?) {
         if (!bottomHeight && !topHeight) {

@@ -444,17 +444,20 @@ export class Form extends BaseComponent<BlockViewDto> {
         this.stopEdit();
         this.values = new StringMap<object>(value);
         this.updateSubComponentValues();
-        this.calcAllField();
+        if (!CommonUtils.isEmpty(value)) {
+            this.calcAllField();
+        }
+
     }
 
     /**
      * 计算所有公式
      */
-    public calcAllField() {
+    async calcAllField() {
         let value = this.getValue();
         let mapValue = this.formulaCalculator.calcAllFormula(value);
         this.updateChangedValue(mapValue);
-        let mapControlResult = this.formulaCalculator.calcAllControlFilter(value);
+        let mapControlResult = await this.formulaCalculator.calcAllControlFilter(value);
         this.updateControlShowFilter(mapControlResult);
     }
 
@@ -562,10 +565,10 @@ export class Form extends BaseComponent<BlockViewDto> {
      *计算可见条件
      * 由于此类计算少，所以就直接遍历计算
      */
-    private calcControlFilter(fieldWhoChanged: string) {
+    private async calcControlFilter(fieldWhoChanged: string) {
         let fieldId = this.viewer.findFieldIdByName(fieldWhoChanged);
         let newData = this.getValue();
-        let controlInfo = this.formulaCalculator.calcFilterOnFieldChange(fieldId, newData);
+        let controlInfo = await this.formulaCalculator.calcFilterOnFieldChange(fieldId, newData);
         if (!fieldId || !controlInfo) {
             return;
         }

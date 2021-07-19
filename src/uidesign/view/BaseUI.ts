@@ -69,6 +69,19 @@ export default abstract class BaseUI<T> implements GeneralEventListener {
         }
     }
 
+    removeListener(type, listener: GeneralEventListener) {
+        if (!type || !listener) {
+            return;
+        }
+        let generalEventListeners = this.mapListener.get(type);
+        if (generalEventListeners) {
+            let index = generalEventListeners.indexOf(listener);
+            if (index != -1) {
+                generalEventListeners.splice(index, 1);
+            }
+        }
+    }
+
     fireReadyEvent() {
         this.ready = true;
         if (this.lstReadyListener) {
@@ -230,6 +243,10 @@ export default abstract class BaseUI<T> implements GeneralEventListener {
         err + '</div>';
         return $(html).get(0);
     }
+
+    resize(event?) {
+
+    }
 }
 
 /**
@@ -302,6 +319,7 @@ class DomAssembleNotifier {
             }
         }
     }
+
 
     private static clearOutOfDateWaiter() {
         if (this.mapElement.getSize() < 1) {

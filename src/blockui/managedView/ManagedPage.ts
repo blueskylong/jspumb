@@ -81,6 +81,7 @@ export class ManagedPage<T extends PageUIInfo> extends PageUI<T> {
         return null;
     }
 
+
     addReadyListener(handler: (source: any) => void) {
         super.addReadyListener(handler);
         //这里增加检查,进一步提示,界面的完成数量

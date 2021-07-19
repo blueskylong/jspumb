@@ -10,7 +10,6 @@ import {ButtonPanel, ButtonPanelProperty} from "./ButtonPanel";
 import {JQBaseComponent} from "../JQBaseComponent";
 import "../templete/FilterEditor.css"
 import {CommonUtils} from "../../../../common/CommonUtils";
-import {FilterExpression} from "../../../../datamodel/DmRuntime/formula/FilterExpression";
 import {Alert} from "../Alert";
 import {FormulaParse} from "../../../../datamodel/DmRuntime/formula/FormulaParse";
 

@@ -21,6 +21,7 @@ export class TreeUI<T extends BlockViewDto> extends BaseComponent<T> {
     private canLoadData = false;
     protected extFilter = {};
     protected treeInfo: JsTreeInfo;
+    protected hasCodeField:false;
 
     protected lstOnceReady: Array<() => void> = new Array<() => void>();
 
@@ -91,7 +92,9 @@ export class TreeUI<T extends BlockViewDto> extends BaseComponent<T> {
         component = this.findCompByTreeType(Constants.TreeRole.codeField, lstComponent);
         if (!component) {
             console.log("TreeUI--->没有指定树结构的编码字段");
+            this.hasCodeField =false;
         } else {
+            this.hasCodeField =false;
             treeInfo.codeField = component.getColumn().getColumnDto().fieldName;
         }
         component = this.findCompByTreeType(Constants.TreeRole.nameField, lstComponent);

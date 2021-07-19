@@ -1,5 +1,6 @@
 import {TransCenter, TransElement} from "./transelement/TransElement";
 import {Schema} from "../Schema";
+import {FormulaInfo} from "../../../blockui/uiruntime/FormulaInfo";
 
 
 /**
@@ -81,13 +82,24 @@ export class FormulaParse implements TransCenter {
         return arrTranslator;
     }
 
-    transToValue(curElement: string, rowData, schema?: Schema, transcenter?: TransCenter): string {
+    async transToValue(curElement: string, rowTableId, rowData, schema?: Schema, transcenter?: TransCenter,  mapGroup?): Promise<string> {
+        let value = null;
+        if(!mapGroup){
+            mapGroup = {};
+        }
         for (let transElement of this.getTranslator()) {
             if (transElement.isMatchInner(curElement)) {
-                return transElement.transToValue(curElement, rowData, schema || this.schema, this);
+                value = await transElement.transToValue(curElement, rowTableId, rowData, schema || this.schema, this, mapGroup);
+                break;
+            } else {
+                value = curElement;
             }
         }
-        return curElement;
+        let promise = new Promise<string>(resolve => {
+            resolve(value);
+        });
+        return promise;
+
     }
 
 }

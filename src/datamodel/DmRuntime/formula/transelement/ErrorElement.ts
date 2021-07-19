@@ -36,7 +36,7 @@ export class ErrorElement implements TransElement {
         throw new Error("[" + curElement + "]无法解析");
     }
 
-    transToValue(curElement: string, rowData, schema?: Schema, transcenter?: TransCenter): string {
+    async transToValue(curElement: string,rowTableId, rowData, schema?: Schema, transcenter?: TransCenter): Promise<string> {
         throw new Error("[" + curElement + "]无法解析");
     }
 

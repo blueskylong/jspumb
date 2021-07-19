@@ -18,4 +18,5 @@ export class PageDetailDto extends BaseDto {
     //默认使用的关联的数据源,可以在创建自定义控件时,使用此属性
     relationDs: number;
     uiCode: string;//编码,用于手动取得控件
+    noFullData: number;//不允许空条件查询
 }

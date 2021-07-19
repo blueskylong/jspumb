@@ -105,7 +105,7 @@ export interface ManagedEventListener {
     dsSelectChanged(source: any, tableId, mapKeyAndValue, row?);
 
     /**
-     * 数据值变化
+     * 某一个数据值变化
      * @param source
      * @param tableId
      * @param mapKeyAndValue
@@ -115,13 +115,13 @@ export interface ManagedEventListener {
     attrChanged(source: any, tableId: number, mapKeyAndValue: object, field: string, value: any);
 
     /**
-     * 数据删除事件
+     * 数据删除,保存事件
      * @param source
      * @param tableId
      * @param mapKeyAndValue
      * @param changeType @See  Constants.TableDataChangedType
      */
-    dataChanged(source: any, tableId, mapKeyAndValue: object, changeType);
+    dataChanged(source: any, tableId, mapKeyAndValue: object, changeType, rowData?: object);
 
     /**
      *数据状态变化

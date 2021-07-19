@@ -336,7 +336,9 @@ export class ManagedTreeUI<T extends BlockViewDto> extends TreeUI<T> implements 
                     .getSubNext();
             }
         }
-        obj[this.jsTree.getDtoInfo().codeField] = levelCode;
+        if (this.hasCodeField) {
+            obj[this.jsTree.getDtoInfo().codeField] = levelCode;
+        }
         return obj;
     }
 

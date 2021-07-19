@@ -34,14 +34,17 @@ export interface TransElement extends TransCenter {
 
 }
 
-export interface TransCenter {
+export class TransCenter {
+
     /**
      * 翻译成中文
      * @param curElement
      * @param preElement
      * @param transcenter
      */
-    transToCn(curElement: string, transcenter?: TransCenter): string;
+    transToCn(curElement: string, transcenter?: TransCenter): string {
+        return null;
+    }
 
     /**
      * 翻译成内部表达式(JS)
@@ -50,7 +53,9 @@ export interface TransCenter {
      * @param schema
      * @param transcenter
      */
-    transToInner(curElement: string, schema?: Schema, transcenter?: TransCenter): string;
+    transToInner(curElement: string, schema?: Schema, transcenter?: TransCenter): string {
+        return null;
+    }
 
     /**
      * 翻译成值表达式,
@@ -59,7 +64,13 @@ export interface TransCenter {
      * @param schema
      * @param transcenter
      */
-    transToValue(curElement: string, rowData, schema?: Schema, transcenter?: TransCenter): string;
+    async transToValue(curElement: string, rowTableId: number, rowData, schema?: Schema, transcenter?: TransCenter,
+                       mapGroup?: object): Promise<string> {
+        let promise = new Promise<string>(resolve => {
+            resolve(null);
+        })
+        return promise;
+    }
 }
 
 

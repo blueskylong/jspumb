@@ -8,6 +8,7 @@ import {FormulaTools} from "./FormulaTools";
 import {SchemaFactory} from "../../SchemaFactory";
 import {Component} from "../../../blockui/uiruntime/Component";
 import {ControlFilterInfo, ControlFilterResult} from "../../../blockui/uiruntime/ControlFilterInfo";
+import {TransCenter} from "./transelement/TransElement";
 
 /**
  * 公式计算器,目前的设计是一切合法的JS 表达式,业务上要求是 +_*\\/括号运算
@@ -32,9 +33,9 @@ export class FormulaCalculator {
 
 
     //计算,只适合表内公式
-    static calc(formula: string, row: object, schema: Schema) {
+    static async calc(formula: string, row: object, schema: Schema): Promise<any> {
         let instance = FormulaParse.getInstance(false, schema);
-        let valueExp = instance.transToValue(formula, row, schema);
+        let valueExp = await instance.transToValue(formula, row, schema);
         return eval(valueExp);
     }
 
@@ -70,7 +71,8 @@ export class FormulaCalculator {
                     formula.getFormulaDto().formulaId + "]存在循环调用.");
             }
             mapHasCalcFormula.set(formula.getFormulaDto().formulaId + "", null);
-            this.calcOneFormula(row, formula, mapHasCalcFormula, mapChangedField);
+            let column = SchemaFactory.getColumnById(formula.getFormulaDto().columnId);
+            this.calcOneFormula(row, column.getColumnDto().tableId, formula, mapHasCalcFormula, mapChangedField);
         }
         return mapChangedField;
 
@@ -94,16 +96,20 @@ export class FormulaCalculator {
      * 计算所有的控制条件
      * @param row
      */
-    public calcAllControlFilter(row: object): StringMap<ControlFilterResult> {
+    public async calcAllControlFilter(row: object): Promise<StringMap<ControlFilterResult>> {
         let result = new StringMap<ControlFilterResult>();
-        this.mapFieldControlFilter.forEach((key, value, map) => {
-            result.setAll(this.doCalcControlFilters(row, value));
-        });
-        return result;
+        let values = this.mapFieldControlFilter.getValues();
+        for (let value of values) {
+            result.setAll(await this.doCalcControlFilters(row, value));
+        }
+        let promise = new Promise<StringMap<ControlFilterResult>>(resolve => {
+            resolve(result);
+        })
+        return promise;
 
     }
 
-    public calcFilterOnFieldChange(fieldId: number, row: object,): StringMap<ControlFilterResult> {
+    public async calcFilterOnFieldChange(fieldId: number, row: object,): Promise<StringMap<ControlFilterResult>> {
         let result = new StringMap<ControlFilterResult>();
         let lstFilter = this.getFieldControlFilter(fieldId);
         if (!lstFilter || lstFilter.length < 1) {
@@ -113,20 +119,30 @@ export class FormulaCalculator {
 
     }
 
-    private doCalcControlFilters(row: object, lstFilter: Array<ControlFilterInfo>) {
+    private async doCalcControlFilters(row: object, lstFilter: Array<ControlFilterInfo>): Promise<StringMap<ControlFilterResult>> {
         let result = new StringMap<ControlFilterResult>();
         for (let filterInfo of lstFilter) {
             result.set(filterInfo.fieldName, {
                 isEditableFilter: filterInfo.isEditableFilter,
-                result: this.calcOneFilter(filterInfo, row)
+                result: await this.calcOneFilter(filterInfo, row)
             });
         }
-        return result;
+        let promise = new Promise<StringMap<ControlFilterResult>>(resolve => {
+            resolve(result);
+        })
+        return promise;
     }
 
-    private calcOneFilter(filterInfo: ControlFilterInfo, row: object): boolean {
-        let exp = this.filterParser.transToValue(filterInfo.filter, row);
-        return this.calcExpresion(exp, false);
+    private async calcOneFilter(filterInfo: ControlFilterInfo, row: object): Promise<boolean> {
+        let column = SchemaFactory.getColumnById(filterInfo.columnId);
+        let exp = await this.filterParser.transToValue(filterInfo.filter, column.getColumnDto().tableId, row
+            , this.schema, this.filterParser, {});
+        let result = this.calcExpresion(exp, false);
+        let promise = new Promise<boolean>(resolve => {
+            resolve(result);
+        });
+        return promise;
+
     }
 
 
@@ -139,15 +155,15 @@ export class FormulaCalculator {
     }
 
 
-    private calcOneFormula(row, formula: FormulaInfo, mapHasCalcFormula, mapChangedField) {
+    private async calcOneFormula(row, tableId, formula: FormulaInfo, mapHasCalcFormula, mapChangedField) {
         //1.先计算本公式
         //1.1 计算过滤条件是不是满足
         if (formula.getFormulaDto().filter != null) {
-            if (!this.calcExpresion(this.filterParser.transToValue(formula.getFormulaDto().filter, row), true))
+            if (!this.calcExpresion(await this.filterParser.transToValue(formula.getFormulaDto().filter, tableId, row, this.schema, this.filterParser, {}), true))
                 return;
         }
         //1.2 计算公式
-        let formulaStr = this.formulaParser.transToValue(formula.getFormulaDto().formula, row);
+        let formulaStr = await this.formulaParser.transToValue(formula.getFormulaDto().formula, tableId, row, this.schema, this.formulaParser, {});
         let value = this.calcExpresion(formulaStr, false);
         //比较一下此值有没有变化,如果变化了,则要将此变化进一步递归下去
         let column = SchemaFactory.getColumnById(formula.getFormulaDto().columnId, formula.getFormulaDto().versionCode);

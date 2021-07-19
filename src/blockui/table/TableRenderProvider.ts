@@ -13,6 +13,7 @@ import FormatterOptions = FreeJqGrid.FormatterOptions;
  * 表体渲染接口,这个针对jqTable.
  */
 export interface TableRenderProvider {
+
     /**
      * 某个单元格的编辑器
      * @param rowid
@@ -217,14 +218,17 @@ export class ServerRenderProvider implements TableRenderProvider {
             //增加一个操作列
             this.lstColumn.push(this.createOperatorColModel());
             for (let node of comNodes) {
+                //隐藏域不显示，表中不显示的列不显示
+                let component = node.data;
+
                 //这里需要先初始化选项数据
-                if (node.data.getColumn().getColumnDto().refId && Constants.ComponentType.select ==
+                if (component.getColumn().getColumnDto().refId && Constants.ComponentType.select ==
                     node.data.getComponentDto().dispType) {
-                    await UiService.getReferenceData(node.data.getColumn().getColumnDto().refId);
+                    await UiService.getReferenceData(component.getColumn().getColumnDto().refId);
                 }
                 if (this.viewer.getBlockViewDto().fieldToCamel == 1) {
-                    node.data.column.getColumnDto().fieldName
-                        = CommonUtils.toCamel(node.data.column.getColumnDto().fieldName);
+                    component.column.getColumnDto().fieldName
+                        = CommonUtils.toCamel(component.column.getColumnDto().fieldName);
                 }
                 if (node.children) {//目前只做二层
                     this.groupHeader.groupHeaders.push(this.createGroupHeader(node));
@@ -232,7 +236,7 @@ export class ServerRenderProvider implements TableRenderProvider {
                         await this.createColModel(subNode.data, this.lstColumn);
                     }
                 } else {
-                    await this.createColModel(node.data, this.lstColumn);
+                    await this.createColModel(component, this.lstColumn);
                 }
             }
             if (this.lstExtCol) {
@@ -284,6 +288,10 @@ export class ServerRenderProvider implements TableRenderProvider {
             labelClasses: Table.COLUMN_LABEL_CLASS_PREFIX + com.getComponentDto().componentId,
             edittype: com.componentDto.dispType as any
         };
+        if (com.getComponentDto().hideInTable == 1 ||
+            com.getComponentDto().dispType === Constants.ComponentType.hidden) {
+            options.hidden=true;
+        }
         if (Constants.ComponentType.checkbox == com.getComponentDto().dispType) {
             options.formatter = "checkbox";
             options.edittype = "checkbox";
@@ -446,7 +454,7 @@ let DEFAULT_TABLE_CONFIG: FreeJqGrid.JqGridOptions = {
         records: "page.totalRecord", // json中代表数据行总数的数据
         repeatitems: true, // 如果设为false，则jqGrid在解析json时，会根据name来搜索对应的数据元素（即可以json中元素可以不按顺序）；而所使用的name是来自于colModel中的name设定。
         cell: "cell",
-        id: "__id__",
+        id: Table.ID_FIELD,
         userdata: "userdata",
         subgrid: {
             root: "lstData",

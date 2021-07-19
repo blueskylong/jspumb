@@ -1,6 +1,7 @@
 import {TransCenter, TransElement} from "./TransElement";
 import {DmConstants} from "../../../DmConstants";
 import {Schema} from "../../Schema";
+import {FormulaInfo} from "../../../../blockui/uiruntime/FormulaInfo";
 
 export abstract class AbstractTransElement implements TransElement {
     protected elementInner = "";
@@ -68,14 +69,21 @@ export abstract class AbstractTransElement implements TransElement {
      * @param schema
      * @param transcenter
      */
-    transToValue(curElement: string, rowData, schema?: Schema, transcenter?: TransCenter): string {
+    async transToValue(curElement: string, rowTableId: number, rowData, schema?: Schema,
+                       transcenter?: TransCenter,  mapGroup?: object): Promise<string> {
         let eles = curElement.split(" " + this.elementInner + " ");
 
         if (eles.length != 2) {
             throw new Error(this.getName() + "条件不合法:需要二个元素进行比较");
         }
-        return transcenter.transToValue(eles[0], rowData, schema, transcenter) + " " + this.getValue(rowData) + " " +
-            transcenter.transToValue(eles[1], rowData, schema, transcenter);
+        let value1 = await transcenter.transToValue(eles[0], rowTableId, rowData, schema, transcenter,  mapGroup);
+        let middle = " " + this.getValue(rowData) + " ";
+        let value2 = await transcenter.transToValue(eles[1], rowTableId, rowData, schema, transcenter,  mapGroup);
+        let promise = new Promise<string>(resolve => {
+            resolve(value1 + middle + value2);
+        });
+        return promise;
+
     }
 
     isOnlyForFilter(): boolean {

@@ -83,6 +83,7 @@ export class DmConstants {
         column: 800,//字段
         sysparam: 900,//系统参数
         constant: 1000,//常量,如"xxx"
+        group: 1100,//分组函数
         error: 9999//错误类型
     }
 }

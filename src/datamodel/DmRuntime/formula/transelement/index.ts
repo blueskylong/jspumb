@@ -17,3 +17,8 @@ export * from "./Or";
 export * from "./StartWith";
 export * from "./SysparamElement";
 export * from "./ErrorElement";
+export * from "./AvgExp";
+export * from "./SumExp";
+export * from "./CountExp";
+export * from "./MinExp";
+export * from "./MaxExp";

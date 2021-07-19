@@ -34,6 +34,7 @@ export class Stars {
 
     static stop() {
         window.cancelAnimationFrame(Stars.amimateionId);
+        Stars.amimateionId = null;
         Stars.stars = [];
         SuperStar.stop();
     }
@@ -93,6 +94,9 @@ export class Stars {
     }
 
     static animateDots() {
+        if (!Stars.amimateionId) {
+            return;
+        }
         Stars.ctx.clearRect(0, 0, Stars.maxWidth, Stars.maxHeight);
         Stars.moveDots(Stars.stars);
         Stars.connectDots(Stars.stars);
@@ -272,7 +276,7 @@ class SuperStar {
         this.maxDistance = Math.abs($(document.body).height() / Math.sin(-this.angle * (Math.PI / 180))) / 1.5 + 200;
         //每一步走的路
         let step = Math.round(this.maxDistance / 5);
-        this.stepX = Math.round(step * Math.cos(-this.angle * (Math.PI / 180)))-1;
+        this.stepX = Math.round(step * Math.cos(-this.angle * (Math.PI / 180))) - 1;
         this.stepY = Math.abs(Math.round(step * Math.sin(-this.angle * (Math.PI / 180))));
 
     }

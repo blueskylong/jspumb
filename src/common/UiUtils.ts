@@ -1,5 +1,4 @@
 //TODO 完善成提示信息
-import {CommonUtils} from "./CommonUtils";
 
 export class UiUtils {
 

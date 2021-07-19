@@ -7,6 +7,7 @@ export class ButtonPanel<T extends ButtonPanelProperty> extends FlowLayout<T> {
 
     private mathPad: FlowLayout<any>;
     private logicPad: FlowLayout<any>;
+    private groupPad: FlowLayout<any>;
     private mathEle = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', ".", "+", "-", "*", "/", "(", ")"];
 
     protected initSubControls() {
@@ -21,6 +22,23 @@ export class ButtonPanel<T extends ButtonPanelProperty> extends FlowLayout<T> {
                 }
             }));
         }
+        this.groupPad = new FlowLayout({});
+        this.addUI(this.groupPad);
+        this.groupPad.setWidth(100);
+        for (let exp of FormulaParse.getTransElements()) {
+            if (exp.getElementType() === DmConstants.FormulaElementType.group) {
+                this.groupPad.addUI(new AcButton({
+                    width: 80,
+                    height: 30,
+                    title: exp.getName(),
+                    value: exp.getExpressionCN(),
+                    clickHandle: (value) => {
+                        this.properties.clickHandle(" " + value + " ");
+                    }
+                }));
+            }
+        }
+
         //增加逻辑按钮
         if (this.properties.isFilter) {
             this.logicPad = new FlowLayout<any>({});

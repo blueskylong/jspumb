@@ -22,6 +22,8 @@ import {Alert} from "../../uidesign/view/JQueryComponent/Alert";
 import ClickEvent = JQuery.ClickEvent;
 import ColumnModel = FreeJqGrid.ColumnModel;
 import {BlockViewer} from "../uiruntime/BlockViewer";
+import htmlString = JQuery.htmlString;
+import {DmConstants} from "../../datamodel/DmConstants";
 
 
 export class ManagedTable extends Table implements AutoManagedUI {
@@ -33,6 +35,8 @@ export class ManagedTable extends Table implements AutoManagedUI {
     protected extFilterTemp = {};
     private lstUseBtn = new Array<MenuButtonDto>();
     private lstToolBtn = new Array<MenuButtonDto>();
+    //记录不可为空的
+    private lstCantNullMasterFields: Array<string>;
     /**
      * 额外按钮事件处理插件
      */
@@ -103,33 +107,74 @@ export class ManagedTable extends Table implements AutoManagedUI {
         return this.pageDetail;
     }
 
+    /**
+     * 同源数据变化时的响应，
+     * 考虑到在编辑阶段，没有保存的情况下一起变化，无法取消，所以改到数据整体变化里再更新
+     * @param source
+     * @param tableId
+     * @param mapKeyAndValue
+     * @param field
+     * @param value
+     */
     attrChanged(source: any, tableId, mapKeyAndValue, field, value) {
-        if (source == this) {
-            return;
-        }
-        //如果和源数据源有1对1的关系 ,则也需要刷新
-        //这里简化,只处理本数据源且是同一行时更新自己
-        let rowId = ManagedUITools.findRow(tableId, mapKeyAndValue, this.getData() as any, Table.ID_FIELD) as any;
-        if (rowId) {
-            let row = this.getRowData(rowId);
-            row[field] = value;
-            this.setRowData(rowId, row);
-        }
+        // if (source == this) {
+        //     return;
+        // }
+        // //如果和源数据源有1对1的关系 ,则也需要刷新
+        // //这里简化,只处理本数据源且是同一行时更新自己
+        // let rowId = ManagedUITools.findRow(tableId, mapKeyAndValue, this.getData() as any, Table.ID_FIELD) as any;
+        // if (rowId) {
+        //     let row = this.getRowData(rowId);
+        //     row[field] = value;
+        //     this.setRowData(rowId, row);
+        // }
     }
 
 
-    dataChanged(source: any, tableId, mapKeyAndValue, changeType) {
+    dataChanged(source: any, tableId, mapKeyAndValue, changeType, row?) {
         if (source == this) {
             return;
         }
+        if (this.dsIds.length !== 1) {
+            return;
+        }
         //只处理单数据源的情况
-        if (this.dsIds.length == 1 && this.dsIds[0] == tableId) {
+        if (this.dsIds[0] == tableId) {
             //如果是同表删除,则直接删除好,不再查询数据库
             if (changeType === Constants.TableDataChangedType.deleted) {
                 let rowId = ManagedUITools.findRow(tableId, mapKeyAndValue, this.getData() as any, Table.ID_FIELD);
                 if (rowId) {
                     this.removeRow(rowId);
                 }
+            } else {
+                if (row) {
+                    let rowId = ManagedUITools.findRow(tableId, mapKeyAndValue, this.getData() as any, Table.ID_FIELD) as any;
+                    if (rowId) {
+                        this.setRowData(rowId, row);
+                    }
+                }
+            }
+
+        } else {
+            //如果不是本表变化,如果存在关联，则刷新当前行
+            if (SchemaFactory.hasRelation(tableId, this.dsIds[0])) {
+                let curRow = this.getCurrentRow();
+                console.log("selectIDs=>" + this.getSelectRowIds());
+                if (!curRow) {
+                    return;
+                }
+                let id = curRow[SchemaFactory.getTableByTableId(this.dsIds[0]).getKeyField()];
+                if (!id) {
+                    return;
+                }
+                let rowId = curRow[Table.ID_FIELD];
+                UiService.findTableRow(this.dsIds[0], id, (result) => {
+                    if (result.data && result.data.length > 0) {
+                        this.setRowData(rowId, this.filterOptionData([result.data[0]])[0]);
+
+
+                    }
+                });
             }
         }
     }
@@ -180,7 +225,13 @@ export class ManagedTable extends Table implements AutoManagedUI {
     }
 
     reloadData() {
-        super.reloadData();
+        //查看条件，如果没有任何条件，且此页面不允许完全查询，则不查询
+        if (this.pageDetail.noFullData != null && this.pageDetail.noFullData == 1 && CommonUtils.isEmpty(this.extFilter)) {
+            this.setData(null);
+        } else {
+            super.reloadData();
+        }
+
         if (this.manageCenter) {
             this.manageCenter.dsSelectChanged(this, this.dsIds[0], null, null);
         }
@@ -207,7 +258,7 @@ export class ManagedTable extends Table implements AutoManagedUI {
     stateChange(source: any, tableId, state: number) {
         if (this.dsIds.indexOf(tableId) != -1) {
             //这是需要进一步判断,哪些控件可以编辑
-            this.setEnable(Constants.TableState.view != state);
+            this.setEnable(Constants.TableState.view == state);
         } else if (SchemaFactory.isChildAndAncestor(tableId, this.dsIds[0])) {
             this.setEnable(Constants.TableState.view === state);
         }
@@ -303,6 +354,19 @@ export class ManagedTable extends Table implements AutoManagedUI {
     }
 
     protected doAdd() {
+        //如果有主表，且没有选择,本表关联字段不可以为空时，则不可以增加
+        if (this.getMasterNotNullRelationFields().length > 0) {
+            if (!this.extFilter) {
+                Alert.showMessage("请选择主表信息");
+                return;
+            }
+            for (let field of this.getMasterNotNullRelationFields()) {
+                if (CommonUtils.isEmpty(this.extFilter[field])) {
+                    Alert.showMessage("请选择主表信息");
+                    return;
+                }
+            }
+        }
         let dlgInfo: ManagedDialogInfo =
             {
                 dsId: this.dsIds[0],
@@ -317,6 +381,44 @@ export class ManagedTable extends Table implements AutoManagedUI {
             };
 
         new ManagedDlg(dlgInfo).show();
+    }
+
+    /**
+     * 取得与主表数据表对应的列，且不可以为空的字段
+     */
+    private getMasterNotNullRelationFields(): Array<string> {
+        if (!this.lstCantNullMasterFields) {
+            this.lstCantNullMasterFields = [];
+            //初始化
+            let thisId = this.dsIds[0];
+            let lstRelation = SchemaFactory.getTableRelations(thisId);
+            if (!lstRelation || lstRelation.length == 0) {
+                return this.lstCantNullMasterFields;
+            }
+            //检查
+            for (let relation of lstRelation) {
+                if (relation.getTableFrom().getTableDto().tableId == thisId) {
+                    if (relation.getDto().relationType == DmConstants.RelationType.oneToOne
+                        || relation.getDto().relationType == DmConstants.RelationType.multiToOne) {
+                        //还需要此字段是必填的
+                        if (!SchemaFactory.getColumnById(relation.getDto().fieldFrom).getColumnDto().nullable) {
+                            this.lstCantNullMasterFields
+                                .push(SchemaFactory.getColumnById(relation.getDto().fieldFrom).getColumnDto().fieldName);
+                        }
+                    }
+                } else {
+                    if (relation.getDto().relationType == DmConstants.RelationType.oneToOne
+                        || relation.getDto().relationType == DmConstants.RelationType.oneToMulti) {
+                        //还需要此字段是必填的
+                        if (!SchemaFactory.getColumnById(relation.getDto().fieldTo).getColumnDto().nullable) {
+                            this.lstCantNullMasterFields
+                                .push(SchemaFactory.getColumnById(relation.getDto().fieldTo).getColumnDto().fieldName);
+                        }
+                    }
+                }
+            }
+        }
+        return this.lstCantNullMasterFields;
     }
 
     private doDelete(data) {

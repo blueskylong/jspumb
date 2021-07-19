@@ -97,14 +97,14 @@ export class ManagedUiCenter implements IManageCenter {
         }
     }
 
-    dataChanged(source: any, tableId, mapKeyAndValue, changeType) {
+    dataChanged(source: any, tableId, mapKeyAndValue, changeType, row?) {
         //首先取得此数据相关的视图,然后通知
         let relationUIs = this.getRelationUIs(tableId);
         for (let ui of relationUIs) {
             if (ui == source) {
                 continue;
             }
-            ui.dataChanged(source, tableId, mapKeyAndValue, changeType);
+            ui.dataChanged(source, tableId, mapKeyAndValue, changeType, row);
         }
     }
 
@@ -277,5 +277,6 @@ export class ManagedUiCenter implements IManageCenter {
     private checkData(rowData: object | Array<object>, dsId) {
         return true;
     }
+    //TODO 计算当前表的全局公式，如果有受影响的界面，界面接收后自行更新
 
 };

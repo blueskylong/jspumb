@@ -20,6 +20,13 @@ export class Table extends BaseComponent<TableRenderProvider> {
     static OPERATE_COL_ID = "__operator__";
     static TOOLBAR_BUTTON_CLASS = "table-col-button";
     static COLUMN_LABEL_CLASS_PREFIX = "COL-ID-";
+
+    /**
+     * 行ID的字段名
+     * 注意这里的要和数据表中的ID字段区分
+     */
+    public static ID_FIELD = "id";
+
     private isMaskChange = false;
     protected static EVENT_UI_READY = "UI_READY_EVENT";
 
@@ -38,10 +45,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
     private isAutoFitWidth = true;
     private isAutoHeight = true;
 
-    /**
-     * 行ID的字段名
-     */
-    public static ID_FIELD = "id";
+
     /**
      * 原始完整的元素指针
      */
@@ -82,6 +86,13 @@ export class Table extends BaseComponent<TableRenderProvider> {
 
     protected onUiReady() {
         this.resize();
+        if (this.isAutoFitWidth) {
+            this.$fullElement.css('overflow-x', 'hidden');
+        }
+        if (this.isAutoHeight) {
+            this.$fullElement.css('overflow-y', 'hidden');
+        }
+
 
     }
 
@@ -265,7 +276,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
      * @returns {any}
      */
     getData() {
-        return this.$element.getRowData(null, {includeId: true});
+        return this.$element.getRowData(undefined, {includeId: true, skipHidden: false});
     }
 
     /**
@@ -424,7 +435,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
         if (CommonUtils.isEmpty(id)) {
             return null;
         }
-        return this.$element.getRowData(id);
+        return this.$element.getRowData(id, {includeId: true});
     }
 
     /**
@@ -452,6 +463,10 @@ export class Table extends BaseComponent<TableRenderProvider> {
         return this.$element.footerData();
     }
 
+    private getColumnModel() {
+        return this.$element.jqGrid("getGridParam", "colModel");
+    }
+
     /**
      * 根据列
      */
@@ -466,7 +481,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
     }
 
     getColNameById(id) {
-        let columnArray = this.$element.jqGrid("getGridParam", "colModel");
+        let columnArray = this.getColumnModel();
         for (let col of columnArray) {
             if (col.id == id) {
                 return col.name;
@@ -474,8 +489,18 @@ export class Table extends BaseComponent<TableRenderProvider> {
         }
     }
 
+    getColByName(colName) {
+        let columnArray = this.getColumnModel();
+        for (let col of columnArray) {
+            if (col.name === colName) {
+                return col;
+            }
+        }
+        return null;
+    }
+
     getColIndexById(id) {
-        let columnArray = this.$element.jqGrid("getGridParam", "colModel");
+        let columnArray = this.getColumnModel();
         let index = 0;
         for (let col of columnArray) {
             if (col.id == id) {
@@ -533,9 +558,25 @@ export class Table extends BaseComponent<TableRenderProvider> {
         this.lastRowId = rowid;
         this.$element.find("tr").removeClass("selected");
         this.$element.find("#" + rowid).addClass("selected");
-        this.fireEvent(Constants.GeneralEventType.SELECT_CHANGE_EVENT, this.getJqTable().getRowData(rowid), this);
+        this.fireEvent(Constants.GeneralEventType.SELECT_CHANGE_EVENT,
+            this.filterOptionData(this.getJqTable().getRowData(rowid)), this);
     }
 
+    /**
+     * 去了控制列信息
+     * @param row
+     */
+    protected filterOptionData(row: object) {
+        let result = {};
+        let hasIDCol = !!this.getColByName(Table.ID_FIELD);
+        for (let field in row) {
+            if (Table.OPERATE_COL_ID === field || (!hasIDCol && Table.ID_FIELD === field)) {
+                continue;
+            }
+            result[field] = row[field];
+        }
+        return result;
+    }
 
     showSearch(isShow) {
         this.$element.filterToolbar({

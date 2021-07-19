@@ -264,24 +264,27 @@ export class ManagedForm extends Form implements AutoManagedUI {
     doSave(callback?: (result) => void) {
         if (this.check()) {
             if (this.manageCenter) {//如果有管理中心
-                this.manageCenter.checkAndSave(this.getValue(), this.dsIds[0], (result: HandleResult) => {
+                let value = this.getValue();
+                this.manageCenter.checkAndSave(value, this.dsIds[0], (result: HandleResult) => {
                     if (result.getSuccess()) {
                         //编辑保存
                         if (this.state === Constants.UIState.edit) {
                             this.manageCenter.dataChanged(this, this.dsIds[0],
-                                ManagedUITools.getDsKeyValue(this.dsIds[0], this.getValue()),
-                                Constants.TableDataChangedType.edited);
+                                ManagedUITools.getDsKeyValue(this.dsIds[0], value),
+                                Constants.TableDataChangedType.edited, value);
                         } else if (this.state === Constants.UIState.add) {
                             //增加保存
                             let obj = {};
-                            obj[ManagedUITools.getOneKeyColumnField(this.dsIds[0])]
-                                = result.data[0][Constants.ConstFieldName.CHANGE_KEYS_FEILD][0][1];
+                            let keyField = ManagedUITools.getOneKeyColumnField(this.dsIds[0]);
+                            let keyValue = result.data[0][Constants.ConstFieldName.CHANGE_KEYS_FEILD][0][1];
+                            obj[keyField] = keyValue;
+                            value[keyField] = keyValue;
                             this.manageCenter.dataChanged(this, this.dsIds[0]
-                                , obj, Constants.TableDataChangedType.added);
+                                , obj, Constants.TableDataChangedType.added, value);
                         }
                         this.setEditable(false);
                         this.manageCenter.stateChange(this, this.dsIds[0], Constants.TableState.view,
-                            ManagedUITools.getDsKeyValue(this.dsIds[0], this.getValue()));
+                            ManagedUITools.getDsKeyValue(this.dsIds[0], value));
                         this.setState(Constants.UIState.view);
 
                         callback && callback(true);

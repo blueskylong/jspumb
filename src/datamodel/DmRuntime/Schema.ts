@@ -12,6 +12,7 @@ import {SchemaFactory} from "../SchemaFactory";
 import {DmConstants} from "../DmConstants";
 import {Alert} from "../../uidesign/view/JQueryComponent/Alert";
 import {StringMap} from "../../common/StringMap";
+import {CommonUtils} from "../../common/CommonUtils";
 
 export class Schema {
     private schemaDto: SchemaDto;
@@ -228,6 +229,7 @@ export class Schema {
         return null;
     }
 
+
     /**
      * 用于保存前的处理
      */
@@ -308,4 +310,28 @@ export class Schema {
         return true;
     }
 
+    /**
+     * 查询二张表的关系
+     *
+     * @param table1
+     * @param table2
+     * @return
+     */
+    findTableRelation(table1, table2): TableColumnRelation {
+        let lstRelation = this.getLstRelation();
+        if (CommonUtils.isEmpty(lstRelation)) {
+            return null;
+        }
+        for (let tableColumnRelation of lstRelation) {
+            if ((tableColumnRelation.getTableFrom().getTableDto().tableId == table1 &&
+                tableColumnRelation.getTableTo().getTableDto().tableId == table2)) {
+                return tableColumnRelation;
+            }
+            if (tableColumnRelation.getTableFrom().getTableDto().tableId == table2 &&
+                tableColumnRelation.getTableTo().getTableDto().tableId == table1) {
+                return tableColumnRelation;
+            }
+        }
+        return null;
+    }
 }

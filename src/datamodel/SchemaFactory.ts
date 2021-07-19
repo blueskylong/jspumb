@@ -67,6 +67,10 @@ export class SchemaFactory {
 
     }
 
+    static getMastTables(tableId) {
+        SchemaFactory.getTablesRelation(tableId, GlobalParams.getLoginVersion());
+    }
+
     static initOneSchema(id, version) {
         DmService.findSchemaInfo(id, version).then(
             (result) => {
@@ -177,17 +181,7 @@ export class SchemaFactory {
      * @param tableId2
      */
     static getTablesRelation(tableId1, tableId2): TableColumnRelation {
-        let tableInfo = this.getTableByTableId(tableId1);
-        if (!tableInfo) {
-            Logger.error("没有查询到表信息");
-            return null;
-        }
-        let schemaId = tableInfo.getTableDto().schemaId;
-        let schema = SchemaFactory.getSchema(schemaId, tableInfo.getTableDto().versionCode);
-        let lstRelation = schema.getLstRelation();
-        if (!lstRelation) {
-            return null;
-        }
+        let lstRelation = SchemaFactory.getSchemaRelationsByTableId(tableId1);
         for (let relation of lstRelation) {
             if ((relation.getTableTo().getTableDto().tableId == tableId1 && relation.getTableFrom().getTableDto().tableId == tableId2)
                 || (relation.getTableTo().getTableDto().tableId == tableId2 && relation.getTableFrom().getTableDto().tableId == tableId1)) {
@@ -199,22 +193,31 @@ export class SchemaFactory {
     }
 
     /**
-     * 查询表与其它表的所有关系
+     * 根据
      * @param tableId
      */
-    static getTableRelations(tableId: number): Array<TableColumnRelation> {
+    static getSchemaRelationsByTableId(tableId: number) {
         let tableInfo = this.getTableByTableId(tableId);
         if (!tableInfo) {
             Logger.error("没有查询到表信息");
             return null;
         }
-        let result = new Array<TableColumnRelation>();
         let schemaId = tableInfo.getTableDto().schemaId;
         let schema = SchemaFactory.getSchema(schemaId, tableInfo.getTableDto().versionCode);
         let lstRelation = schema.getLstRelation();
         if (!lstRelation) {
             return null;
         }
+        return lstRelation;
+    }
+
+    /**
+     * 查询表与其它表的所有关系
+     * @param tableId
+     */
+    static getTableRelations(tableId: number): Array<TableColumnRelation> {
+        let lstRelation = SchemaFactory.getSchemaRelationsByTableId(tableId);
+        let result = new Array<TableColumnRelation>();
         for (let relation of lstRelation) {
             if (relation.getTableTo().getTableDto().tableId == tableId
                 || relation.getTableFrom().getTableDto().tableId == tableId) {
@@ -222,6 +225,51 @@ export class SchemaFactory {
             }
         }
         return result;
+    }
+
+    /**
+     * 判断二个表是不是存在直接关系或间接关系
+     * @param table1
+     * @param table2
+     */
+    public static hasRelation(table1, table2): boolean {
+        let tableRelations = SchemaFactory.getTableRelations(table1);
+        if (!tableRelations || tableRelations.length == 0) {
+            return false;
+        }
+        let stack = new Array<number>();
+        for (let tableRelation of tableRelations) {
+            if (SchemaFactory.isThoseTwoTablesRelation(table1, table2, tableRelation)) {
+                return true;
+            }
+            ///收集待处理的关系
+            stack.push(tableRelation.getTableTo().getTableDto().tableId === table1 ?
+                tableRelation.getTableFrom().getTableDto().tableId : tableRelation.getTableTo().getTableDto().tableId);
+        }
+        //记录所有出现过的关系,
+        let allAppeardRelation = new Array<number>();
+        allAppeardRelation.push(...stack);
+        let newChildId;
+        while (stack.length > 0) {
+            //取得最前面的表进行处理
+            newChildId = stack.pop();
+            //查询关系
+            tableRelations = SchemaFactory.getTableRelations(newChildId);
+            for (let tableRelation of tableRelations) {
+                if (SchemaFactory.isThoseTwoTablesRelation(newChildId, table2, tableRelation)) {
+                    return true;
+                }
+                ///收集待处理的关系
+                let nextId = tableRelation.getTableTo().getTableDto().tableId === newChildId ?
+                    tableRelation.getTableFrom().getTableDto().tableId : tableRelation.getTableTo().getTableDto().tableId;
+                if (stack.indexOf(nextId) == -1) {//如果是新关系,则压栈.
+                    stack.push(nextId);
+                }
+            }
+
+        }
+        return false;
+
     }
 
 
@@ -302,6 +350,19 @@ export class SchemaFactory {
             return true;
         }
         return false;
+    }
+
+    /**
+     *判断是不是指定的二张表的关系
+     * @param tableId1
+     * @param tableId2
+     * @param tableRelation
+     */
+    private static isThoseTwoTablesRelation(tableId1, tableId2, tableRelation: TableColumnRelation) {
+        return (tableRelation.getTableFrom().getTableDto().tableId === tableId1
+            && tableRelation.getTableTo().getTableDto().tableId === tableId2) ||
+            (tableRelation.getTableFrom().getTableDto().tableId === tableId2
+                && tableRelation.getTableTo().getTableDto().tableId === tableId1);
     }
 
     /**

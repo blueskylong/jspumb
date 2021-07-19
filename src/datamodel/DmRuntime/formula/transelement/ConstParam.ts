@@ -51,8 +51,11 @@ export class ConstParam implements TransElement {
         return "'" + curElement + "'"
     }
 
-    transToValue(curElement: string, rowData, schema?: Schema, transcenter?: TransCenter): string {
-        return this.transToInner(curElement, schema, transcenter);
+    async transToValue(curElement: string, rowTableId, rowData, schema?: Schema, transcenter?: TransCenter, mapGroup?): Promise<string> {
+        let promise = new Promise<string>((resolve => {
+            return this.transToInner(curElement, schema, transcenter);
+        }));
+        return promise;
     }
 
     isOnlyForFilter(): boolean {

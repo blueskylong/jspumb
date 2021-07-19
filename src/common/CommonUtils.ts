@@ -31,8 +31,27 @@ export class CommonUtils {
         CommonUtils.configs = configs;
     }
 
+    /**
+     * 转换成双精度数值
+     *
+     * @param obj
+     * @return
+     */
+    public static toDouble(obj: object): number {
+        if (obj == null) {
+            return 0;
+        }
+        if (obj instanceof Number) {
+            return Number.parseFloat(obj.toString(2));
+        }
+        return Number.parseFloat(obj.toString());
+    }
+
     static isEmpty(obj: any) {
         let str = typeof obj;
+        if (str === "object") {
+            return $.isEmptyObject(obj);
+        }
         return str === "undefined" || obj == null || "" === obj;
     }
 
