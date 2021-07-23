@@ -1,6 +1,6 @@
 {
   "name": "aolie_core",
-  "version": "0.0.8",
+  "version": "0.0.10",
   "description": "Aolie lower code system",
   "main": "index.js",
   "author": "xxl",
