@@ -211,7 +211,7 @@ export class MainFrame<T extends HomeInfo> extends BaseUI<T> implements IMainFra
         UiUtils.showMask();
         if (this.lastFunc) {
             try {
-                if (!this.lastFunc.beforeClose()) {
+                if (this.lastFunc.beforeClose && !this.lastFunc.beforeClose()) {
                     return false;
                 }
                 this.lastFunc.destroy();

@@ -65,5 +65,14 @@ export class BlockedHomePage extends BaseUI<any> {
         this.fireReadyEvent();
     }
 
+    destroy(): boolean {
+        if (this.lstBlockBox) {
+            for (let box of this.lstBlockBox) {
+                box.destroy();
+            }
+        }
+        return super.destroy();
+    }
+
 
 }
