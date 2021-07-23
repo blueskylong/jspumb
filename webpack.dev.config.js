@@ -4,7 +4,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const dirs = require('./webpack-config/common/dirs.dev.config.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-// json loader
+// json loader，nhd
 config.module.rules.push({test: /\.json$/, loader: 'json'});
 
 // 拷贝config.json文件。处理html模板文件

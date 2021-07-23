@@ -11,7 +11,7 @@ import {GlobalParams} from "../../common/GlobalParams";
 import {StringMap} from "../../common/StringMap";
 import {RightRelationDto} from "./service/RightRelationDto";
 import {CycleDetector} from "./graph/CycleDetector";
-import EChartOption = echarts.EChartOption;
+import EChartOption = echarts.EChartsOption;//echart 5.0+ 已经改为此参数，否则编译报错
 
 export class RightGraphPanel extends BaseUI<any> {
     private mapRelation: StringMap<RightRelationDto> = new StringMap<RightRelationDto>();
