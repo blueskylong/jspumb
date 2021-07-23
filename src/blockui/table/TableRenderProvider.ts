@@ -289,7 +289,7 @@ export class ServerRenderProvider implements TableRenderProvider {
             edittype: com.componentDto.dispType as any
         };
         if (com.getComponentDto().hideInTable == 1 ||
-            com.getComponentDto().dispType === Constants.ComponentType.hidden) {
+            com.getComponentDto().dispType == Constants.ComponentType.hidden) {
             options.hidden=true;
         }
         if (Constants.ComponentType.checkbox == com.getComponentDto().dispType) {

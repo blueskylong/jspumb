@@ -31,8 +31,9 @@ OrangeRed	橙红色	#FF4500	255,69,0
     cursor: pointer;
 }
 
-.base-comp lable.com-editor {
+.base-comp label.com-editor {
     text-align: left;
+    background-color: #e9ecef;
 }
 
 .btn-toolbar {

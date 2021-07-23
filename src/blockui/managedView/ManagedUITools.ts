@@ -164,10 +164,15 @@ export class ManagedUITools {
         return null;
     }
 
-    private static isInRow(row, map: object) {
+    /**
+     * subObject是不是包含在fullObject中
+     * @param fullObject
+     * @param subObject
+     */
+    public static isInRow(fullObject, subObject: object) {
         let result = true;
-        new StringMap(map).forEach((key, value, map) => {
-            if (!row.hasOwnProperty(key) || row[key] != value) {
+        new StringMap(subObject).forEach((key, value, map) => {
+            if (!fullObject.hasOwnProperty(key) || fullObject[key] != value) {
                 result = false;
                 return false;
             }

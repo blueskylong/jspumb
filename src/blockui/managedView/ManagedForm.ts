@@ -74,13 +74,19 @@ export class ManagedForm extends Form implements AutoManagedUI {
     }
 
 
-    dataChanged(source: any, dsId, id) {
+    dataChanged(source: any, dsId, mapKeyAndValue: object, changeType, rowData?: object) {
         if (source == this) {
             return;
         }
         //只处理单数据源的情况
         if (this.dsIds.length == 1 && this.dsIds[0] == dsId) {
-            this.setValue({});
+            if (changeType === Constants.TableDataChangedType.edited
+                || changeType === Constants.TableDataChangedType.added) {
+                this.setValue(rowData);
+            } else {
+                this.setValue({});
+            }
+
         }
     }
 
@@ -297,7 +303,7 @@ export class ManagedForm extends Form implements AutoManagedUI {
                 });
             } else {
                 UiService.saveRows([this.getValue()], this.dsIds[0], (result: HandleResult) => {
-                    callback && callback(result.getSuccess());
+                    callback && callback(this.state === Constants.UIState.add ? result.data : true);
                 });
             }
 

@@ -159,8 +159,8 @@ export class ManagedTable extends Table implements AutoManagedUI {
             //如果不是本表变化,如果存在关联，则刷新当前行
             if (SchemaFactory.hasRelation(tableId, this.dsIds[0])) {
                 let curRow = this.getCurrentRow();
-                console.log("selectIDs=>" + this.getSelectRowIds());
                 if (!curRow) {
+                    console.log("---------> local failure!");
                     return;
                 }
                 let id = curRow[SchemaFactory.getTableByTableId(this.dsIds[0]).getKeyField()];
@@ -170,8 +170,14 @@ export class ManagedTable extends Table implements AutoManagedUI {
                 let rowId = curRow[Table.ID_FIELD];
                 UiService.findTableRow(this.dsIds[0], id, (result) => {
                     if (result.data && result.data.length > 0) {
-                        this.setRowData(rowId, this.filterOptionData([result.data[0]])[0]);
-
+                        let queryValue =  this.filterOptionData([result.data[0]])[0];
+                        let row = CommonUtils.noEmptyField(queryValue);
+                        let oldRow = CommonUtils.noEmptyField(this.filterOptionData(curRow));
+                        if (!ManagedUITools.isInRow(row, oldRow)) {
+                            this.setRowData(rowId, queryValue);
+                            this.manageCenter.dataChanged(this, this.getTableIds()[0], ManagedUITools.getDsKeyValue(tableId, row),
+                                Constants.TableDataChangedType.edited, queryValue);
+                        }
 
                     }
                 });
@@ -373,10 +379,14 @@ export class ManagedTable extends Table implements AutoManagedUI {
                 initValue: this.extFilter,
                 title: "增加",
                 operType: Constants.DsOperatorType.add,
-                callback: () => {
+                callback: (result, rowId) => {
                     this.manageCenter.dataChanged(this, this.dsIds[0],
                         null, Constants.TableDataChangedType.added);
+                    this.getJqTable().one("jqGridAfterLoadComplete", (e) => {
+                        this.locateRow(this.getKeyField(), rowId);
+                    });
                     this.reload();
+
                 }
             };
 
@@ -446,11 +456,14 @@ export class ManagedTable extends Table implements AutoManagedUI {
                 initValue: key,
                 title: canEdit ? "修改" : "查看",
                 operType: canEdit ? Constants.DsOperatorType.edit : Constants.DsOperatorType.view,
-                callback: () => {
+                callback: (result, rowId) => {
                     let obj = {};
                     obj[this.getKeyField()] = this.getKeyValue(data);
                     this.manageCenter.dataChanged(this, this.dsIds[0],
                         obj, Constants.TableDataChangedType.edited);
+                    this.getJqTable().one("jqGridAfterLoadComplete", (e) => {
+                        this.locateRow(this.getKeyField(), rowId);
+                    });
                     this.reload();
                 }
             };

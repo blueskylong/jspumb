@@ -69,7 +69,12 @@ export class ManagedDlg<T extends ManagedDialogInfo> extends Dialog<T> {
             this.ui["doSave"]((result) => {
                 if (result) {
                     if (this.properties.callback) {
-                        this.properties.callback(true);
+                        if (this.properties.operType === Constants.DsOperatorType.add) {
+                            this.properties.callback(true, result[0].keys[0][1]);
+                        } else {
+                            this.properties.callback(true, this.properties.initValue);
+                        }
+
                     }
                     this.close();
                 }
@@ -112,5 +117,5 @@ export interface ManagedDialogInfo extends DialogInfo {
     operType: number;//操作类型,查看,修改,增加 参见: Constants.TableOperatorType
     blockViewId?: number;//指定显示的视图 与DSID相同，此参数优先级高于数据表默认编辑界面的设定．
     showType?: number;//指定显示类型
-    callback?(result: boolean): void;
+    callback?(result: boolean, rowId?): void;
 }

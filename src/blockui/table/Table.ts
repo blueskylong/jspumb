@@ -10,6 +10,7 @@ import {BaseComponent} from "../../uidesign/view/BaseComponent";
 import FormatterOptions = FreeJqGrid.FormatterOptions;
 import ColumnModel = FreeJqGrid.ColumnModel;
 import {UiUtils} from "../../common/UiUtils";
+import {DmConstants} from "../../datamodel/DmConstants";
 
 
 export class Table extends BaseComponent<TableRenderProvider> {
@@ -433,7 +434,11 @@ export class Table extends BaseComponent<TableRenderProvider> {
     getCurrentRow() {
         let id = this.$element.getGridParam("selrow");
         if (CommonUtils.isEmpty(id)) {
-            return null;
+            let rows = this.$element.find("tr.selected");
+            if (rows.length == 0) {
+                return null;
+            }
+            id = rows[0].id;
         }
         return this.$element.getRowData(id, {includeId: true});
     }
@@ -570,7 +575,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
         let result = {};
         let hasIDCol = !!this.getColByName(Table.ID_FIELD);
         for (let field in row) {
-            if (Table.OPERATE_COL_ID === field || (!hasIDCol && Table.ID_FIELD === field)) {
+            if (Table.OPERATE_COL_ID === field || (!hasIDCol && Table.ID_FIELD === field) || DmConstants.ConstField.versionCode === field) {
                 continue;
             }
             result[field] = row[field];
@@ -786,9 +791,22 @@ export class Table extends BaseComponent<TableRenderProvider> {
     hideUnVisibleCol() {
         if (this.properties.getBlockInfo() && this.properties.getBlockInfo().getLstComponent()) {
             for (let com of this.properties.getBlockInfo().getLstComponent()) {
-                if (com.componentDto.dispType === Constants.ComponentType.hidden) {
+                if (com.componentDto.dispType == Constants.ComponentType.hidden) {
                     this.$element.hideCol(com.column.getColumnDto().fieldName, {notSkipFrozen: true});
                 }
+            }
+        }
+    }
+
+    public locateRow(fieldName: string, value: any) {
+        let rows = this.getData();
+        if (!rows) {
+            return;
+        }
+        for (let row of <Array<object>>rows) {
+            if (row[fieldName] == value) {
+                this.getJqTable().setSelection(row[Table.ID_FIELD]);
+                return;
             }
         }
     }
@@ -799,7 +817,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
     showUnVisibleCol() {
         if (this.properties.getBlockInfo() && this.properties.getBlockInfo().getLstComponent()) {
             for (let com of this.properties.getBlockInfo().getLstComponent()) {
-                if (com.componentDto.dispType === Constants.ComponentType.hidden) {
+                if (com.componentDto.dispType == Constants.ComponentType.hidden) {
                     this.$element.showCol(com.column.getColumnDto().fieldName, {notSkipFrozen: true});
                 }
             }

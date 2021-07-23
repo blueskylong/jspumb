@@ -444,10 +444,6 @@ export class Form extends BaseComponent<BlockViewDto> {
         this.stopEdit();
         this.values = new StringMap<object>(value);
         this.updateSubComponentValues();
-        if (!CommonUtils.isEmpty(value)) {
-            this.calcAllField();
-        }
-
     }
 
     /**

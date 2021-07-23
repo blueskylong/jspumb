@@ -10,7 +10,7 @@ export class Label<T extends Component> extends TextInput<T> {
     }
 
     protected createEditor(id: string) {
-        return $("<lable class='com-editor form-control' id='" + id
+        return $("<label class='com-editor form-control' id='" + id
             + "' />");
     }
 

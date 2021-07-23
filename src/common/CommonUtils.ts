@@ -295,4 +295,17 @@ export class CommonUtils {
     //     alert("this is opera");     //Opera
     // }
 
+    /**
+     * 取得非空字段
+     * @param obj
+     */
+    static noEmptyField(obj: object) {
+        let result = {};
+        for (let field in obj) {
+            if (obj[field]) {
+                result[field] = obj[field];
+            }
+        }
+        return result;
+    }
 }
