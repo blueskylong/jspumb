@@ -76,6 +76,7 @@ export default class BlockDesign<T extends MenuInfo> extends MenuFunction<T> {
             }
         });
         $ele.find(".ds-tree").append(this.dsTree.getViewUI());
+        UiUtils.addAutoHeightFit(this.dsTree.getViewUI());
 
         this.blockTree = new JsTree<JsTreeInfo>({
             rootName: "视图",
@@ -116,6 +117,8 @@ export default class BlockDesign<T extends MenuInfo> extends MenuFunction<T> {
             });
         $ele.find(".block-tree").append(this.schemaSelect.getViewUI());
         $ele.find(".block-tree").append(this.blockTree.getViewUI());
+
+        UiUtils.addAutoHeightFit(this.blockTree.getViewUI());
 
         this.designPanel = new DesignPanel<any>({});
         $ele.find(".design-form").append(this.designPanel.getViewUI());

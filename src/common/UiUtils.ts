@@ -102,13 +102,15 @@ export class UiUtils {
                 if (children.get(i) === el) {
                     continue;
                 }
-                brotherHeight += $(children.get(i)).height();
+                brotherHeight += $(children.get(i)).outerHeight(true);
             }
         }
         if (parHeight <= brotherHeight) {
             return -1;
         }
-        return parHeight - brotherHeight;
+        //还要去掉自身的margin
+        let thisMarginHeight = $(el).outerHeight(true) - $(el).height();
+        return parHeight - brotherHeight - thisMarginHeight;
     }
 
     static addAutoHeightFit(el: HTMLElement) {

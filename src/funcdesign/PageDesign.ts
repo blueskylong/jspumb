@@ -133,6 +133,8 @@ export default class PageDesign<T extends MenuInfo> extends MenuFunction<T> {
     afterComponentAssemble(): void {
         this.$element.find(".split-pane")['splitPane']();
         this.$element.find(".page-tree").append(this.pageTree.getViewUI());
+        UiUtils.addAutoHeightFit(this.pageTree.getViewUI());
+
         this.$element.find(".block-tree").append(this.blockTree.getViewUI());
         this.$element.find(".center-panel").append(this.splitCenter.getViewUI());
         this.splitCenter.addComponent(BorderLayout.center, this.designPanel);

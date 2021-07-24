@@ -8,7 +8,7 @@
     align-content: center;
 }
 
-.filter-editor [component-class="TextArea"] {
+.filter-editor [component-class="textarea"] {
     margin-bottom: 0px;
 }
 

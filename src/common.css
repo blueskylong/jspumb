@@ -37,11 +37,11 @@ html {
     height: calc(1.4em);
 }
 
-.form-group[component-class="Hidden"] {
+.form-group[component-class="hidden"] {
     display: none;
 }
 
-.design-component .form-group[component-class="Hidden"] {
+.design-component .form-group[component-class="hidden"] {
     display: inherit;
 }
 

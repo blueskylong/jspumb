@@ -120,8 +120,4 @@ th.selected {
     border: dashed darkgray 1px;
 }
 
-.block-design .js-tree{
-
-    height: calc(100% - 54px);
-}
 

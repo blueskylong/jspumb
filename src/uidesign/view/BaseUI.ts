@@ -111,8 +111,12 @@ export default abstract class BaseUI<T> implements GeneralEventListener {
             this.initEvent();
             DomAssembleNotifier.getInstance().addWaitingUI(this);
         }
-
-        this.$element.attr("component-class", this.constructor.name);
+        //这个在代码压缩后，就不起作用了
+        let compType = this.constructor.name;
+        if (this['getEditorType'] && typeof this['getEditorType'] === 'function') {
+            compType = this["getEditorType"]();
+        }
+        this.$element.attr("component-class", compType);
         this.$element.attr("hashcode", this.hashCode);
 
         return this.element;

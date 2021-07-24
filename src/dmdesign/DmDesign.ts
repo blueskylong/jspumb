@@ -109,7 +109,7 @@ export default class DmDesign<T extends MenuInfo> extends MenuFunction<T> {
                 //找到列对应的表
                 let tableView = this.schemaView.findTableById((<Column>dto).getColumnDto().tableId);
                 this.updateReference(tableView);
-                this.fTable.setValue(tableView.getDtoInfo());
+                this.fTable.setValue(tableView.getDtoInfo().getTableDto());
                 this.listFormula.setData((<Column>dto).getLstFormulaDto(), this.schemaView.getSchema());
                 this.columnDto = (<Column>dto).getColumnDto();
             }

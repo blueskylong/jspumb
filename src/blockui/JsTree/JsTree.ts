@@ -205,9 +205,7 @@ export class JsTree<T extends JsTreeInfo> extends BaseComponent<T> {
         if (!this.properties.url) {
             this.setValue(null);
         }
-        if (this.properties.showSearch) {
-            this.$jsTree.css("height", "calc(100%-60px)")
-        }
+
         this.createToolbar();
     }
 
@@ -362,6 +360,15 @@ export class JsTree<T extends JsTreeInfo> extends BaseComponent<T> {
             this.btns.addClass("hidden");
             this.hoverData = null;
         });
+    }
+
+    afterComponentAssemble(): void {
+        if (this.properties.showSearch) {
+            this.$jsTree.css("height", "calc(100%-60px)")
+        } else {
+            this.$jsTree.css("height", "calc(100%-10px)")
+        }
+        super.afterComponentAssemble();
     }
 
     /**
