@@ -268,7 +268,7 @@ export class CommonUtils {
     }
 
     static getDialogFullSize() {
-        return [document.body.clientWidth, document.body.clientHeight - 210];
+        return [document.body.clientWidth-200, document.body.clientHeight - 210];
     }
 
     /**
