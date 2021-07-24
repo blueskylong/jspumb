@@ -44,6 +44,7 @@ export class DesignComponent<T extends Component> extends BaseComponent<T> {
         if (this.isContainer()) {
             $ele.find(".masker").css("z-index", 0);
         }
+        $ele.attr("title","原始字段："+this.properties.getColumn().getColumnDto().fieldName);
         return $ele.get(0);
     }
 
@@ -82,6 +83,7 @@ export class DesignComponent<T extends Component> extends BaseComponent<T> {
         this.getDtoInfo().getComponentDto().horSpan = 12;
         this.getDtoInfo().getComponentDto().verSpan = -1;
         this.getDtoInfo().getComponentDto()[propertyName] = value;
+        this.properties.setLayoutType(Constants.PositionLayoutType.bootstrapLayout);
         if (this.isNeedRecreate(propertyName)) {
             this.createComponent();
         }
@@ -225,7 +227,7 @@ export class DesignComponent<T extends Component> extends BaseComponent<T> {
         this.component = this.generator.generateComponent(this.properties.componentDto.dispType, this.properties,
             null);
         $(this.component.getViewUI()).insertBefore(this.$element.children()[0]);
-//        this.component.afterComponentAssemble();
+
         if (this.lstSubComp && this.isContainer()) {
             for (let designCom of this.lstSubComp) {
                 (<Panel<any>>this.getRealComp()).addSubControl(designCom);
