@@ -283,7 +283,6 @@ class DomAssembleNotifier {
         if (DomAssembleNotifier.mapElement.has(ui.getHashCode() + "")) {
             return;
         } else {
-            // console.log("----->addUI:" + ui.getHashCode());
             if (DomAssembleNotifier.task == null) {
                 DomAssembleNotifier.task = setInterval(() => {
                     DomAssembleNotifier.clearOutOfDateWaiter();
