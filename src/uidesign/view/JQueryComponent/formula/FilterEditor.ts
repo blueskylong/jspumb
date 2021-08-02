@@ -8,7 +8,7 @@ import {Schema} from "../../../../datamodel/DmRuntime/Schema";
 import {GlobalParams} from "../../../../common/GlobalParams";
 import {ButtonPanel, ButtonPanelProperty} from "./ButtonPanel";
 import {JQBaseComponent} from "../JQBaseComponent";
-import "../templete/FilterEditor.css"
+import "../template/FilterEditor.css"
 import {CommonUtils} from "../../../../common/CommonUtils";
 import {Alert} from "../Alert";
 import {FormulaParse} from "../../../../datamodel/DmRuntime/formula/FormulaParse";

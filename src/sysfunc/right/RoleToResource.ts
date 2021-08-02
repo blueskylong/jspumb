@@ -190,7 +190,14 @@ export class RoleToResource<T extends PageDetailDto> extends AbstractManagedCust
         }
     }
 
-    doSave() {
+    checkAndSave(): Promise<boolean> {
+        return this.doSave();
+    }
+
+    doSave(): Promise<boolean> {
+        if (!this.editable) {
+            return new Promise<boolean>(resolve => resolve(true));
+        }
         let data = this.menuBtn.getValue();
         this.mapTree.forEach((key, tree, map) => {
             data[key] = tree.getTree().getSelectedId(true);

@@ -160,6 +160,10 @@ export class Form extends BaseComponent<BlockViewDto> {
         } else {
             this.$element.find(".btn-close").addClass(Form.HIDDEN_CLASS);
         }
+        //如果显示表头，且设置了表单的高，则要加上表头的高度
+        if (this.properties.rowSpan > 12 && this.isShowTitle) {
+            this.$element.css("height", this.properties.rowSpan + 50);
+        }
     }
 
 
@@ -345,7 +349,7 @@ export class Form extends BaseComponent<BlockViewDto> {
     }
 
     protected createUI(): HTMLElement {
-        let $ele = $(require("./templete/Form.html"));
+        let $ele = $(require("./template/Form.html"));
         $ele.attr("blockId", this.blockViewId);
 
         $ele.find(".close-button").on("click", (event) => {

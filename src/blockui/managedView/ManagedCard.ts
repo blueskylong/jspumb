@@ -58,6 +58,7 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
         return super.destroy();
     }
 
+
     private locateForm(tableId, mapKeyAndValue): Form {
         if (!mapKeyAndValue) {
             return null;
@@ -125,10 +126,7 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
         if (source == this) {
             return;
         }
-        //查询数据源之间的关系,如果是同一源,不处理
-        if (this.dsIds.length == 1 && this.dsIds[0] == tableId) {
-            return;
-        }
+
         let tableRelationField = ManagedUITools.getTableRelationField(tableId, this.dsIds);
         if (!tableRelationField) {
             return null
@@ -139,7 +137,7 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
             return;
         }
         //增加条件到本次查询,如果没有取消,则会一直接有效
-        this.extFilter[tableRelationField[1]] = row[tableRelationField[0]] || mapKeyAndValue[tableRelationField[0]];
+        this.extFilter[tableRelationField[1]] = (row[tableRelationField[0]] || mapKeyAndValue[tableRelationField[0]]) + "";
         this.loadData(this.extFilter);
 
     }
@@ -165,7 +163,7 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
         let card = new ManagedCard(blockDto);
         card.pageDetail = pageDetail;
         card.addReadyListener(() => {
-                card.setEditable(card.getPageDetail().initState == Constants.UIState.view);
+                card.setFullEditable(card.getPageDetail().initState == Constants.UIState.view);
             }
         )
         return card;
@@ -183,7 +181,7 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
     stateChange(source: any, tableId, state: number) {
         if (this.dsIds.indexOf(tableId) != -1) {
             //这是需要进一步判断,哪些控件可以编辑
-            this.setEditable(Constants.TableState.view != state);
+            this.setFullEditable(Constants.TableState.view != state);
         }
         return false;
     }
@@ -228,12 +226,13 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
         if (!btns || btns.length < 1) {
             return;
         }
+        this.setFullEditable(false);
         for (let btn of btns) {
             let isUse = btn.isUsed;
             btn.isUsed = true;
             this.setSortable(true);
             if (btn.tableOpertype === Constants.DsOperatorType.edit) {
-                this.setEditable(true);
+                this.setFullEditable(true);
 
             } else if (btn.tableOpertype === Constants.DsOperatorType.add) {
                 this.setShowAdd(true);
@@ -249,6 +248,13 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
         }
 
 
+    }
+
+    /**
+     * 取得固定的值
+     */
+    protected getFixValue() {
+        return this.extFilter;
     }
 
     /**
@@ -268,6 +274,9 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
 
     loadData(filter?) {
         this.deleteIds = [];
+        if (this.pageDetail.noFullData && CommonUtils.isEmpty(filter)) {
+            return;
+        }
         super.loadData(filter);
     }
 
@@ -275,9 +284,14 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
         return Constants.UIDataNum.multi;
     }
 
-    save() {
+    async save(): Promise<boolean> {
+        if(!this.editable){
+            return new Promise(resolve => resolve(true));
+        }
         if (!this.check()) {
-            return;
+            return new Promise(resolve => {
+                resolve(false);
+            });
         }
         let data = this.getValue();
         if (!data) {
@@ -294,8 +308,14 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
                 this.deleteIds = [];
                 Alert.showMessage("保存成功!");
                 this.loadData();
+                return new Promise(resolve => {
+                    resolve(true);
+                });
             } else {
                 Alert.showMessage("保存失败!" + result.err);
+                return new Promise(resolve => {
+                    resolve(false);
+                });
             }
         })
     }
@@ -324,5 +344,9 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
         return this.keyField;
     }
 
+    checkAndSave() {
+        //本身不修改数据
+        return this.save();
+    }
 
 }

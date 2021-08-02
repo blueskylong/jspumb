@@ -303,7 +303,7 @@ export class ManagedForm extends Form implements AutoManagedUI {
                 });
             } else {
                 UiService.saveRows([this.getValue()], this.dsIds[0], (result: HandleResult) => {
-                    callback && callback(this.state === Constants.UIState.add ? result.data : true);
+                    callback && callback(this.state === Constants.UIState.add ? result.data as any : true);
                 });
             }
 
@@ -388,6 +388,20 @@ export class ManagedForm extends Form implements AutoManagedUI {
 
     reload(): void {
         //TODO
+    }
+
+    checkAndSave() {
+        if (!this.isEditable()) {
+            return new Promise<boolean>(resolve => {
+                resolve(true);
+            })
+        }
+        return new Promise<boolean>(resolve => {
+            this.doSave((result) => {
+                resolve(!!result);
+            });
+        })
+
     }
 
     doEdit(data?, id?): boolean {

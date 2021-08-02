@@ -176,10 +176,25 @@ export class ManagedPage<T extends PageUIInfo> extends PageUI<T> {
      * @param obj
      */
     protected static isAutoManagedUI(obj: Object) {
-        return obj['getPageDetail'] && obj["getTableIds"] && obj["setManageCenter"];
+        return obj['getPageDetail'] && obj["getTableIds"] && obj["setManageCenter"] && obj["checkAndSave"];
     }
 
     getUiDataNum(): number {
         return Constants.UIDataNum.multi;
+    }
+
+    /**
+     * 检查并保存
+     */
+    async checkAndSave(): Promise<boolean> {
+        for (let subUi of this.lstBaseUI) {
+            if (ManagedPage.isAutoManagedUI(subUi)) {
+                let result = await (<AutoManagedUI>(subUi as any)).checkAndSave();
+                if (!result) {
+                    return new Promise(resolve => resolve(false));
+                }
+            }
+        }
+        return new Promise(resolve => resolve(true));
     }
 }

@@ -16,7 +16,7 @@ export class Alert<T extends AlertInfo> extends BaseUI<T> {
     private time = 500000;
 
     protected createUI(): HTMLElement {
-        let $ele = $(require("./templete/Alert.html"));
+        let $ele = $(require("./template/Alert.html"));
         $ele.find("span").text(this.properties.message);
         if (this.properties.type && Alert.type[this.properties.type]) {
             $ele.addClass(Alert.type[this.properties.type]);

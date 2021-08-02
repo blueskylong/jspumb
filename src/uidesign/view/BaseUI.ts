@@ -251,6 +251,10 @@ export default abstract class BaseUI<T> implements GeneralEventListener {
     resize(event?) {
 
     }
+
+    refresh(data?) {
+
+    }
 }
 
 /**

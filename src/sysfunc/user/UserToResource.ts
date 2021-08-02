@@ -103,6 +103,10 @@ export class UserToResource<T extends PageDetailDto> extends BaseComponent<T> im
     referenceSelectChanged(source: any, refId, id, isLeaf) {
     }
 
+    checkAndSave(): Promise<boolean> {
+        return this.doSave();
+    }
+
     setButtons(buttons: Array<MenuButtonDto>) {
         if (!buttons) {
             return;
@@ -165,10 +169,15 @@ export class UserToResource<T extends PageDetailDto> extends BaseComponent<T> im
         this.setEditable(true);
     }
 
-    private doSave() {
+    private doSave(): Promise<boolean> {
+        if(!this.editable){
+            return new Promise(resolve => resolve(true));
+        }
         if (!this.userId) {
             Alert.showMessage("没有需要保存的变动");
-            return;
+            return new Promise<boolean>(resolve => {
+                resolve(true);
+            });
         }
         let result = {};
 
@@ -182,8 +191,14 @@ export class UserToResource<T extends PageDetailDto> extends BaseComponent<T> im
         UserService.saveUserRight(this.userId, result, (result2) => {
             if (result2.success) {
                 Alert.showMessage("保存成功!");
+                return new Promise<boolean>(resolve => {
+                    resolve(true);
+                });
             } else {
                 Alert.showMessage(result2.err);
+                return new Promise<boolean>(resolve => {
+                    resolve(false);
+                });
             }
         });
     }

@@ -56,7 +56,10 @@ export interface AutoManagedUI extends ManagedEventListener {
 
     reload(): void;
 
-
+    /**
+     * 检查并保存，返回是否完成
+     */
+    checkAndSave(): Promise<boolean>;
 }
 
 /**

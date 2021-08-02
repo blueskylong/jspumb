@@ -7,8 +7,8 @@ import {UiUtils} from "../../../common/UiUtils";
 
 @RegComponent(Constants.ComponentType.text)
 export class TextInput<T extends Component> extends JQBaseComponent<T> {
-    private static TEMPLATE = require("./templete/BaseInput.html");
-    private static TEMPLATE_RIGHT = require("./templete/BaseInput-right.html");
+    private static TEMPLATE = require("./template/BaseInput.html");
+    private static TEMPLATE_RIGHT = require("./template/BaseInput-right.html");
 
 
     protected createUI(): HTMLElement {

@@ -170,7 +170,7 @@ export class ManagedTable extends Table implements AutoManagedUI {
                 let rowId = curRow[Table.ID_FIELD];
                 UiService.findTableRow(this.dsIds[0], id, (result) => {
                     if (result.data && result.data.length > 0) {
-                        let queryValue =  this.filterOptionData([result.data[0]])[0];
+                        let queryValue = this.filterOptionData([result.data[0]])[0];
                         let row = CommonUtils.noEmptyField(queryValue);
                         let oldRow = CommonUtils.noEmptyField(this.filterOptionData(curRow));
                         if (!ManagedUITools.isInRow(row, oldRow)) {
@@ -519,6 +519,11 @@ export class ManagedTable extends Table implements AutoManagedUI {
                 inter.afterHandle && inter.afterHandle(operType + "", this.dsIds[0], data, this);
             }
         }
+    }
+
+    checkAndSave(): Promise<boolean> {
+        //本身不修改数据
+        return new Promise(resolve => resolve(true));
     }
 
     private getKeyValue(data) {

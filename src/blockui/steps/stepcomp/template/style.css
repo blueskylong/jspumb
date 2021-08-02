@@ -1,0 +1,296 @@
+/* DaTouWang URL: www.datouwang.com */
+.step {
+    counter-reset: flag;
+    font-family: 'Microsoft YaHei', 'Lantinghei SC', 'Open Sans', Arial, 'Hiragino Sans GB', 'STHeiti', 'WenQuanYi Micro Hei', 'SimSun', sans-serif;
+}
+
+.step li {
+    position: relative;
+    transition: all 0.3s ease-in-out;
+    -webkit-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+}
+
+.step li a {
+    cursor: pointer;
+    padding: 10px 15px;
+    transition: all 0.3s ease-in-out;
+    -webkit-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+}
+
+.step li a:before {
+    content: counter(flag);
+    counter-increment: flag;
+    transition: all 0.3s ease-in-out;
+    -webkit-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+}
+
+.step li a:after {
+    content: "";
+    transition: all 0.3s ease-in-out;
+    -webkit-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+}
+
+.step-arrow.unhover li:not(.read-only) a:hover,
+.step-arrow.unhover li a:focus {
+    background-color: #f6f6f6;
+    color: #444444;
+}
+
+.step-arrow.unhover li:not(.read-only) a:hover:before,
+.step-arrow.unhover li a:focus:before {
+    background-color: #d2d2d2;
+    color: #ffffff;
+}
+
+.step-arrow.unhover li:not(:last-child):not(.read-only) a:hover:after,
+.step-arrow.unhover li:not(:last-child) a:focus:after {
+    background-color: #f6f6f6;
+}
+
+.step-arrow li {
+    padding-right: 20px;
+}
+
+.step-arrow li:last-child {
+    padding-right: 0;
+}
+
+.step-arrow li:nth-child(n+2) a {
+    margin-left: -20px;
+    border-radius: 0;
+}
+
+.step-arrow li:not(:last-child) a:after {
+    position: absolute;
+    top: -1px;
+    right: -20px;
+    width: 40px;
+    height: 40px;
+    transform: scale(0.707) rotate(45deg);
+    z-index: 1;
+    background-color: rgb(190, 222, 255);
+    border-radius: 0 5px 0 50px;
+    border-top: 1px solid #ffffff;
+    border-right: 1px solid #ffffff;
+    box-sizing: content-box;
+}
+
+.step-arrow li:not(:last-child):not(.read-only) a:hover:after {
+    background-color: #1E90FF;
+}
+
+.step-arrow li a {
+    border-radius: 0;
+    color: #444444;
+    background-color: rgb(190, 222, 255);
+}
+
+.step-arrow li:not(.read-only) a:hover {
+    background-color: #1E90FF;
+    color: #ffffff !important;
+}
+
+.step-arrow li:not(.read-only) a:hover:before {
+    background: #ffffff;
+    color: #1E90FF;
+}
+
+.step-arrow li a:before {
+    position: absolute;
+    z-index: 2;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    border-radius: 20px;
+    left: 3rem;
+    font-weight: bold;
+    font-size: 1rem;
+    overflow: hidden;
+    top: 10px;
+    background: #bbbbbb;
+    color: #ffffff;
+}
+
+.step-arrow li.active.current a:before {
+
+    background: #ffbc41;
+    color: #ffffff;
+}
+
+.step-arrow li.active a:before {
+    background: #ffffff;
+    color: #1E90FF;
+}
+
+.step-arrow li.active a:after {
+    background-color: #1E90FF;
+}
+
+.step-arrow li.active a,
+.step-arrow li.active:not(.read-only) a:hover {
+    background-color: #1E90FF;
+    color: #ffffff;
+}
+
+.step-arrow li.active a:before,
+.step-arrow li.active:not(.read-only) a:hover:before {
+    background-color: #ffffff;
+    color: #1E90FF;
+}
+
+.step-arrow.nav > li.read-only:not(.active) > a:hover {
+    background-color: rgb(190, 222, 255)
+}
+
+.step-arrow li.active a:after,
+.step-arrow li.active:not(.read-only) a:hover:after {
+    background-color: #1E90FF !important;
+}
+
+.step-arrow li.active.error a:before {
+    background: #ee1a16;
+    color: #ffffff;
+}
+
+.step-arrow li.active.error a,
+.step-arrow li.active:not(.read-only).error a:hover {
+    color: #ee1a16;
+    font-weight: bolder;
+}
+
+.step-round {
+    margin-top: 40px;
+}
+
+.step-round > li:first-child > a:after {
+    left: 30%;
+    border-radius: 5px 0 0 5px;
+}
+
+.step-round > li:last-child > a:after {
+    right: 30%;
+    border-radius: 0 5px 5px 0;
+}
+
+.step-round > li.active > a,
+.step-round > li.active:not(.read-only) > a:hover,
+.step-round > li.active > a:focus {
+    background: transparent;
+    color: #1E90FF;
+}
+
+
+.step-round > li.active > a:before,
+.step-round > li.active:not(.read-only) > a:hover:before,
+.step-round > li.active > a:focus:before {
+    background-color: #1E90FF;
+    color: #ffffff;
+}
+
+.step-round > li.active > a:after,
+.step-round > li.active:not(.read-only) > a:hover:after,
+.step-round > li.active > a:focus:after {
+    background-color: #1E90FF;
+}
+
+.step-round li.active.error a:before {
+    background: #ee1a16;
+    color: #ffffff;
+}
+
+.step-round li.active.error a,
+.step-round li.active:not(.read-only).error a:hover {
+    color: #ee1a16;
+    font-weight: bolder;
+}
+
+.step-round > li.active.error > a:after,
+.step-round > li.active:not(.read-only).error > a:hover:after,
+.step-round > li.active.error > a:focus:after {
+    background-color: #ee1a16;
+}
+
+
+.step-round > li > a {
+    color: #ebebeb;
+}
+
+.step-round > li > a:before {
+    position: absolute;
+    z-index: 2;
+    top: -2rem;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: #ffffff;
+    line-height: 2rem;
+    box-shadow: 0 0 0 5px #ebebeb;
+}
+
+.step-round > li > a:after {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -38%;
+    background-color: #ebebeb;
+    z-index: 1;
+    height: 8px;
+}
+
+.step-round > li > a:after:after {
+    background-color: #1E90FF;
+}
+
+.step-round > li:not(.read-only) > a:hover {
+    background: transparent;
+    color: #1E90FF;
+}
+
+.step-round > li:not(.read-only) > a:hover:before {
+    background-color: #1E90FF;
+    color: #ffffff;
+}
+
+.step-round > li:not(.read-only) > a:hover:after {
+    background-color: #1E90FF;
+}
+
+.bottom-btn-toolbar {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    padding-right: 20px;
+
+    padding-top: 10px ;
+    margin-bottom: 10px;
+    border-top: 1px solid lightgray;
+}
+
+.bottom-btn-toolbar .toolbar-button:not(.disabled):hover {
+    background-color: darkorange;
+    color: white;
+    font-weight: bold;
+}
+
+.bottom-btn-toolbar .toolbar-button:not(.disabled) {
+    background-color: #1E90FF;
+    color: white;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+.bottom-btn-toolbar .button-adjust {
+    border-right: 1px solid lightgray;
+    padding-right: 10px;
+}
+
+

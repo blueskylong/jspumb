@@ -42,7 +42,7 @@ export class CardList<T extends BlockViewDto> extends BaseComponent<T> {
 
 
     protected createUI(): HTMLElement {
-        let $ele = $(require("../templete/CardList.html"));
+        let $ele = $(require("../template/CardList.html"));
         return $ele.get(0);
     }
 
@@ -92,7 +92,7 @@ export class CardList<T extends BlockViewDto> extends BaseComponent<T> {
 
     protected initEvent() {
         this.$element.find(".btn-add").on("click", (event) => {
-            this.addNewCard({});
+            this.addNewCard(this.getFixValue());
             this.updateBtnPosition();
             this.updateHint();
         });
@@ -102,12 +102,20 @@ export class CardList<T extends BlockViewDto> extends BaseComponent<T> {
     }
 
     /**
+     * 取得固定的值
+     */
+    protected getFixValue() {
+        return {};
+    }
+
+    /**
      * 可以编辑,有表头,有增加,有删除
      */
-    setFullEditable() {
-        this.setEditable(true);
-        this.setShowAdd(true);
-        this.setRemoveable(true);
+    setFullEditable(editable = true) {
+        this.setEditable(editable);
+        this.setShowAdd(editable);
+        this.setRemoveable(editable);
+        this.setSortable(editable, true);
     }
 
     async initViewer() {
@@ -132,7 +140,7 @@ export class CardList<T extends BlockViewDto> extends BaseComponent<T> {
             () => {
                 let blockId = this.viewer.getBlockViewDto().blockViewId;
                 CommonUtils.handleResponse(NetRequest.axios.post(CardList.serverDataUrl + "/" + blockId
-                    , filter ? $.extend({"extFilter": filter}, {blockId: blockId})
+                    , filter ? $.extend({"extFilter": JSON.stringify(filter)}, {blockId: blockId})
                         : {blockId: blockId}),
                     (result: HandleResult) => {
                         if (result.success) {
@@ -274,8 +282,10 @@ export class CardList<T extends BlockViewDto> extends BaseComponent<T> {
         }
     }
 
-    save() {
-
+    save(): Promise<boolean> {
+        return new Promise(resolve => {
+            resolve(true);
+        });
     }
 
     /**

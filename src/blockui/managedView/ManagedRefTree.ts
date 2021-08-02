@@ -45,7 +45,9 @@ export class ManagedRefTree<T extends ReferenceTreeInfo> extends ReferenceTree<T
     setManageCenter(listener: ManagedEventListener) {
         this.listener = listener;
     }
-
+    checkAndSave(): Promise<boolean> {
+        return new Promise<boolean>(resolve => resolve(true));
+    }
     stateChange(source: any, tableId, state: number) {
     }
 

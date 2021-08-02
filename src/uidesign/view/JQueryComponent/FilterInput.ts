@@ -12,6 +12,7 @@ import {Constants} from "../../../common/Constants";
 import {FormulaParse} from "../../../datamodel/DmRuntime/formula/FormulaParse";
 import {TextInput} from "./TextInput";
 import {Alert} from "./Alert";
+import {GlobalParams} from "../../../common/GlobalParams";
 
 @RegComponent(Constants.ComponentType.filter)
 export class FilterInput<T extends Component> extends TextInput<T> {
@@ -31,7 +32,7 @@ export class FilterInput<T extends Component> extends TextInput<T> {
 
     protected createEditor(id: string) {
         return $("<textarea class='com-editor form-control' id='" + id
-            + "' />");
+            + "' name='" + this.properties.getColumn().getColumnDto().fieldName + "'/>");
     }
 
     private showDlg() {
@@ -93,9 +94,17 @@ export class FilterInput<T extends Component> extends TextInput<T> {
     }
 
     setExtendData(data: StringMap<any>) {
+        if (!data) {
+            console.log("没有提供需要的信息:方案信息");
+            return;
+        }
         this.schema = data.get(FilterInput.schemaParamName);
         if (this.schema == null) {
-            console.log("没有提供需要的信息:方案信息")
+            console.log("没有提供需要的信息:方案信息");
+            return;
+        }
+        if (typeof this.schema !== "object") {
+            this.schema = SchemaFactory.getSchema(this.schema as any, GlobalParams.getLoginVersion());
         }
     }
 
@@ -149,7 +158,7 @@ export class FilterInput<T extends Component> extends TextInput<T> {
                 super.setValue(FormulaParse.getInstance(this.isFilter(),
                     this.schema).transToCn(this.filter));
             } else {
-               super.setValue(null);
+                super.setValue(null);
             }
         } catch (e) {
             console.log(e.message);

@@ -22,7 +22,7 @@ export class ManagedFunc<T extends MenuInfo> extends MenuFunction<T> {
     private isValid = false;
 
     protected createUI(): HTMLElement {
-        return $(require("./templete/FunctionUI.html")).get(0);
+        return $(require("./template/FunctionUI.html")).get(0);
     }
 
     protected async initSubControls() {

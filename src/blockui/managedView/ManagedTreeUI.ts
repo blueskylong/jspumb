@@ -30,6 +30,7 @@ export class ManagedTreeUI<T extends BlockViewDto> extends TreeUI<T> implements 
     protected pageDetail: PageDetailDto;
 
     private oneKeyField = null;
+    private hasSaveLevel = false;
 
 
     attrChanged(source: any, tableId, mapKeyAndValue, field, value) {
@@ -49,6 +50,16 @@ export class ManagedTreeUI<T extends BlockViewDto> extends TreeUI<T> implements 
                 }
 
             }
+        }
+    }
+
+    checkAndSave(): Promise<boolean> {
+        //本身不修改数据
+        if (this.hasSaveLevel) {
+            return this.doSaveLevel();
+        } else {
+            return new Promise(resolve => resolve(true));
+
         }
     }
 
@@ -225,6 +236,7 @@ export class ManagedTreeUI<T extends BlockViewDto> extends TreeUI<T> implements 
                     let btn = validBtns[i];
                     btn.isUsed = true;
                     if (btn.tableOpertype === Constants.DsOperatorType.saveLevel) {
+                        this.hasSaveLevel = true;
                         this.getTree().setDraggable(true);
                         buttonInfos[i].isShow = (node) => {
                             return !node.data;
@@ -355,7 +367,12 @@ export class ManagedTreeUI<T extends BlockViewDto> extends TreeUI<T> implements 
         return this.oneKeyField;
     }
 
-    private doSaveLevel() {
+    private doSaveLevel(): Promise<boolean> {
+        if (!this.hasSaveLevel) {
+            return new Promise(resolve => {
+                resolve(false);
+            });
+        }
         let oraData = this.getTree().getJsTree().get_json(null, {flat: false});
         if (oraData && oraData.length > 0) {
             let obj = {};
@@ -374,11 +391,22 @@ export class ManagedTreeUI<T extends BlockViewDto> extends TreeUI<T> implements 
                     this.getTree().selectNodeById(curId);
                     UiUtils.hideMask();
                     Alert.showMessage("保存成功");
+                    return new Promise(resolve => {
+                        resolve(true);
+                    })
+                } else {
+                    return new Promise(resolve => {
+                        resolve(false);
+                    })
                 }
 
             });
+        } else {
+            return new Promise(resolve => {
+                resolve(true);
+            });
         }
-        return true;
+
     }
 
     private makeLevel(codePro: CodeLevelProvider, node, obj) {

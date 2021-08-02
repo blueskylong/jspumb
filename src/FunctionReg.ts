@@ -23,3 +23,7 @@ import "./sysfunc/right/RightRelationFunc";
 import "./sysfunc/user/UserManageUI";
 import "./plugmanage/PlugMangeUI";
 
+import "./blockui/steps";
+
+
+

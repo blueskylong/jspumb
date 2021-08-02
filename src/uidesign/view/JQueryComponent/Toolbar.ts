@@ -9,7 +9,7 @@ export class Toolbar<T extends ToolbarInfo> extends BaseUI<T> {
     private toolbarDragHandler: (event, ui: DraggableEventUIParams) => void;
 
     protected createUI(): HTMLElement {
-        return $(require("./templete/Toolbar.html")).get(0);
+        return $(require("./template/Toolbar.html")).get(0);
     }
 
     afterComponentAssemble(): void {
@@ -43,6 +43,10 @@ export class Toolbar<T extends ToolbarInfo> extends BaseUI<T> {
         } else {
             this.$element.css("position", "inherit");
         }
+        if (this.properties.fullWidth) {
+            this.$element.addClass("full-width");
+            this.$element.addClass("justify-content-center");
+        }
     }
 
     setDoubleClickHandler(doubleClickHandler: Function) {
@@ -59,11 +63,35 @@ export class Toolbar<T extends ToolbarInfo> extends BaseUI<T> {
     }
 
     public addButton(btnInfo: ButtonInfo) {
+        if (!this.$element) {
+            this.getViewUI();
+        }
         let button = new ToolbarButton(btnInfo);
         this.lstButton.push(button);
         this.$element.append(button.getViewUI());
         //      button.afterComponentAssemble();
 
+    }
+
+    public removeButton(btnInfo: ButtonInfo) {
+        if (btnInfo) {
+            for (let index = 0; index < this.lstButton.length; index++) {
+                let button = this.lstButton[index];
+                if (button.getId() === btnInfo.id) {
+                    button.destroy();
+                    this.lstButton.splice(index, 1);
+                }
+            }
+        }
+    }
+
+    public removeButtons(btns: Array<ButtonInfo>) {
+        if (btns) {
+            for (let btnInfo of btns) {
+                this.removeButton(btnInfo);
+            }
+
+        }
     }
 
     public addButtons(lstButton: Array<ButtonInfo>) {
@@ -87,6 +115,7 @@ export class Toolbar<T extends ToolbarInfo> extends BaseUI<T> {
     updateShow() {
         if (this.lstButton) {
             for (let btn of this.lstButton) {
+                btn.updateShow();
             }
         }
     }
@@ -110,7 +139,7 @@ export class Toolbar<T extends ToolbarInfo> extends BaseUI<T> {
 export class ToolbarButton<T extends ButtonInfo> extends BaseUI<T> {
     protected createUI(): HTMLElement {
 
-        let $dom = $(require("./templete/ToolbarButton.html"));
+        let $dom = $(require("./template/ToolbarButton.html"));
         if (this.properties.text) {
             $dom.find(".button-label").text(this.properties.text);
         }
@@ -130,9 +159,7 @@ export class ToolbarButton<T extends ButtonInfo> extends BaseUI<T> {
     }
 
     public updateShow() {
-        if (this.properties.isShow(this.properties)) {
-
-        }
+        this.setVisible((!this.properties.isShow) || this.properties.isShow(this.properties.id))
     }
 
     public setEnable(enabled: boolean) {
@@ -169,7 +196,7 @@ export interface ButtonInfo {
     text?: string;
     iconClass?: string;
     hint?: string;
-    isShow?: (data) => boolean;
+    isShow?: (id: string | any) => boolean;
     clickHandler?: (event: ClickEvent, data?, sourceComponent?) => void;
 }
 
@@ -177,4 +204,5 @@ export interface ToolbarInfo {
     btns?: Array<string>,
     handler?: Array<(event) => void>,
     float: boolean;
+    fullWidth?: boolean;
 }

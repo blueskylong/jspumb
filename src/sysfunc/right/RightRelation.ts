@@ -168,19 +168,25 @@ export class RightRelation<T extends PageDetailDto> extends AbstractManagedCusto
 
     }
 
-    doSave() {
+    doSave(): Promise<boolean> {
         if (!this.editable) {
             Alert.showMessage("当前为只读状态,没有变化需要保存");
-            return;
+            return new Promise<boolean>(resolve => resolve(true));
         }
         this.writebackData();
         UserService.saveRightRelationDetailsByRrId(this.lastRrid, this.mapValue.getObject(), result => {
             if (result.success) {
                 Alert.showMessage("保存成功");
+                return new Promise<boolean>(resolve => resolve(true));
                 this.setEditable(false);
                 this.manageCenter.stateChange(this, this.getTableIds()[0], Constants.TableState.view);
             }
+            return new Promise<boolean>(resolve => resolve(false));
         });
+    }
+
+    checkAndSave(): Promise<boolean> {
+        return this.doSave();
     }
 
     private clearTree() {

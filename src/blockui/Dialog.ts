@@ -11,7 +11,7 @@ export class Dialog<T extends DialogInfo> extends BaseUI<T> {
         large: "modal-lg",
         x_large: "modal-xl"
     };
-    private static TEMPLATE = require("./templete/Dialog.html");
+    private static TEMPLATE = require("./template/Dialog.html");
     private static FOOTER_SELECTOR = ".modal-footer";
     private static OK_BUTTON_SELECTOR = ".dlg-ok-button";
     private static CLOSE_BUTTON_SELECTOR = ".dlg-close-button";

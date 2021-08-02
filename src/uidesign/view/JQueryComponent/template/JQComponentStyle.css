@@ -27,6 +27,13 @@ OrangeRed	橙红色	#FF4500	255,69,0
     color: #1E90FF;
 }
 
+.btn-toolbar.full-width {
+    width: 100%;
+    border-radius: 0px;
+}
+.btn-toolbar.full-width .toolbar-handler{
+    display: none;
+}
 .btn-toolbar .toolbar-button {
     cursor: pointer;
 }

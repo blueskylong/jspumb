@@ -37,7 +37,7 @@ export class JsTree<T extends JsTreeInfo> extends BaseComponent<T> {
 
     protected createUI(): HTMLElement {
         this.dragable = this.properties && this.properties.dnd && this.properties.dnd.isDraggable;
-        return $(require("../templete/JsTree.html")).get(0);
+        return $(require("../template/JsTree.html")).get(0);
     }
 
     private treeProps = {

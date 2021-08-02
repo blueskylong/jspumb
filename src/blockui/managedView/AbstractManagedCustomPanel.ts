@@ -36,6 +36,9 @@ export abstract class AbstractManagedCustomPanel<T extends PageDetailDto> extend
         return 1;
     }
 
+    abstract checkAndSave(): Promise<boolean> ;
+
+
     referenceSelectChanged(source: any, refId, id, isLeaf) {
     }
 
@@ -43,7 +46,7 @@ export abstract class AbstractManagedCustomPanel<T extends PageDetailDto> extend
     }
 
     setEditable(editable): void {
-        this.editable =editable;
+        this.editable = editable;
     }
 
     setManageCenter(manageCenter: IManageCenter) {

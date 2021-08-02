@@ -95,7 +95,11 @@ export class Constants {
         /**
          * 双击事件
          */
-        EVENT_DBL_CLICK: "DBL_CLICK"
+        EVENT_DBL_CLICK: "DBL_CLICK",
+        /**
+         * 点击事件
+         */
+        EVENT_CLICK: "CLICK"
     };
 
     /**

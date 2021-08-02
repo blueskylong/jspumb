@@ -32,6 +32,10 @@ export abstract class BaseAutoManagedUI<T> extends BaseComponent<T> implements A
         return undefined;
     }
 
+    checkAndSave(): Promise<boolean> {
+        return new Promise<boolean>(resolve => resolve(true));
+    }
+
     getUiDataNum(): number {
         return 0;
     }

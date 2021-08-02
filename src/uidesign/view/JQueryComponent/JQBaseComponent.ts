@@ -1,5 +1,5 @@
 import {BaseComponent} from "../BaseComponent";
-import "./templete/JQComponentStyle.css";
+import "./template/JQComponentStyle.css";
 import {Component} from "../../../blockui/uiruntime/Component";
 import {GeneralEventListener} from "../../../blockui/event/GeneralEventListener";
 

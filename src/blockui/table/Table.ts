@@ -530,7 +530,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
     }
 
     protected createUI(): HTMLElement {
-        let $ele = $(require("../templete/Table.html"));
+        let $ele = $(require("../template/Table.html"));
         $ele.find(".jq-pager").attr("id", this.getPagerId());
         this.$fullElement = $ele;
         return $ele.get(0);

@@ -21,7 +21,9 @@ export class ManagedCustomPanelContainer<T extends PageDetailDto> extends BaseUI
     getUiDataNum(): number {
         return this.customControl.getUiDataNum();
     }
-
+    checkAndSave(): Promise<boolean> {
+        return new Promise<boolean>(resolve => resolve(true));
+    }
     setButtons(buttons: Array<MenuButtonDto>) {
         this.customControl.setButtons(buttons);
     }

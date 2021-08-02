@@ -48,7 +48,7 @@ export class Panel<T extends Component> extends TextInput<T> {
     }
 
     protected loadTemplate(): string {
-        return require("./templete/Panel.html");
+        return require("./template/Panel.html");
     }
 
 }
