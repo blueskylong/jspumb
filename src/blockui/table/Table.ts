@@ -546,7 +546,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
         }
 
         this.resizeListener = () => {
-            if (this.isDestroied()) {
+            if (this.isDestroyed()) {
                 return;
             }
             this.resize()

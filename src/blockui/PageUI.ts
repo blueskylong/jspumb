@@ -17,7 +17,7 @@ import {ReferenceTree} from "./JsTree/ReferenceTree";
 import BaseUI from "../uidesign/view/BaseUI";
 import {ManagedCustomPanelContainer} from "./managedView/ManagedCustomPanelContainer";
 
-export default class PageUI<T extends PageUIInfo> extends BaseComponent<any> {
+export default class PageUI<T extends PageUIInfo> extends BaseComponent<T> {
 
     protected layout: BorderLayout<any>;
     protected pageInfo: PageInfo;
@@ -40,24 +40,20 @@ export default class PageUI<T extends PageUIInfo> extends BaseComponent<any> {
 
     async initSubControls() {
         if (!this.pageInfo) {
+            console.log("------>1");
             this.pageInfo = await UiService.findPageInfo(this.properties.pageId) as any;
+            console.log("------>2");
         }
         if (!this.pageInfo || !this.pageInfo.getPageDetail()) {
+            console.log("------>3");
             return;
         }
-        this.addComponents();
-        this.$element.append(this.layout.getViewUI());
-    }
-
-    public getPageInfo(): PageInfo {
-        return this.pageInfo;
-    }
-
-    private async addComponents() {
+        console.log("------>4");
         let lstPageDetail = this.pageInfo.getPageDetail();
         if (!lstPageDetail || lstPageDetail.length == 0) {
             return;
         }
+        console.log("------>5");
         this.layout = new BorderLayout<any>(this.initWidthAndHeight(lstPageDetail));
         for (let detail of lstPageDetail) {
             let baseUI = await this.createSubUI(detail);
@@ -65,8 +61,17 @@ export default class PageUI<T extends PageUIInfo> extends BaseComponent<any> {
             this.layout.addComponent(detail.pagePosition, baseUI);
             //计算宽度和高度
         }
+
+        console.log("------>6");
+
+        this.$element.append(this.layout.getViewUI());
         this.layout.show();
     }
+
+    public getPageInfo(): PageInfo {
+        return this.pageInfo;
+    }
+
 
     private initWidthAndHeight(lstPageDetail: Array<PageDetailDto>) {
 

@@ -1,4 +1,4 @@
-import {AutoManagedUI} from "./AutoManagedUI";
+import {AutoManagedUI, EventInterceptor, IManageCenter} from "./AutoManagedUI";
 
 import {ManagedTable} from "./ManagedTable";
 import {ManagedForm} from "./ManagedForm";
@@ -15,23 +15,31 @@ import {ManagedRefTree} from "./ManagedRefTree";
 import {ManagedCard} from "./ManagedCard";
 import {ManagedCustomPanelContainer} from "./ManagedCustomPanelContainer";
 import {CommonUtils} from "../../common/CommonUtils";
+import {StringMap} from "../../common/StringMap";
+import {MenuButtonDto} from "../../sysfunc/menu/dto/MenuButtonDto";
 
 /**
  * 此表单只响应列表或树选中情况下的显示
  * 表单只响应本级数据源的变化
  */
-export class ManagedPage<T extends PageUIInfo> extends PageUI<T> {
+export class ManagedPage<T extends PageUIInfo> extends PageUI<T> implements AutoManagedUI {
     protected pageDetail: PageDetailDto;
+    private lstSubManagedUI: Array<AutoManagedUI>;
+    private manageCenter: IManageCenter;
 
     getSubManagedUI(): Array<AutoManagedUI> {
+        if (this.lstSubManagedUI) {
+            return this.lstSubManagedUI;
+        }
         let result = new Array<AutoManagedUI>();
         for (let subComp of this.lstBaseUI) {
-            if (ManagedPage.isAutoManagedUI(subComp)) {
-                result.push(subComp as any);
-            } else if (subComp instanceof ManagedPage) {
+            if (subComp instanceof ManagedPage) {
                 result.push(...subComp.getSubManagedUI());
+            } else if (ManagedPage.isAutoManagedUI(subComp)) {
+                result.push(subComp as any);
             }
         }
+        this.lstSubManagedUI = result;
         return result;
     }
 
@@ -44,17 +52,18 @@ export class ManagedPage<T extends PageUIInfo> extends PageUI<T> {
             return null;
         }
         for (let subComp of this.lstBaseUI) {
-            if (ManagedPage.isAutoManagedUI(subComp)) {
-                if (controlCode == (subComp as any).getPageDetail().uiCode) {
-                    return subComp as any;
-                }
-            } else if (subComp instanceof ManagedPage) {
+            if (subComp instanceof ManagedPage) {
                 let result = subComp.findSubUI(controlCode);
                 if (result) {
                     return result;
                 }
+            } else if (ManagedPage.isAutoManagedUI(subComp)) {
+                if (controlCode == (subComp as any).getPageDetail().uiCode) {
+                    return subComp as any;
+                }
             }
         }
+
         return null;
     }
 
@@ -67,14 +76,14 @@ export class ManagedPage<T extends PageUIInfo> extends PageUI<T> {
             return null;
         }
         for (let subComp of this.lstBaseUI) {
-            if (ManagedPage.isAutoManagedUI(subComp)) {
-                if (subComp instanceof _Constructor) {
-                    return subComp as any;
-                }
-            } else if (subComp instanceof ManagedPage) {
+            if (subComp instanceof ManagedPage) {
                 let result = subComp.findSubUIByType(_Constructor);
                 if (result) {
                     return result;
+                }
+            } else if (ManagedPage.isAutoManagedUI(subComp)) {
+                if (subComp instanceof _Constructor) {
+                    return subComp as any;
                 }
             }
         }
@@ -175,7 +184,7 @@ export class ManagedPage<T extends PageUIInfo> extends PageUI<T> {
      * 判断是不是自管理类型
      * @param obj
      */
-    protected static isAutoManagedUI(obj: Object) {
+    public static isAutoManagedUI(obj: Object) {
         return obj['getPageDetail'] && obj["getTableIds"] && obj["setManageCenter"] && obj["checkAndSave"];
     }
 
@@ -197,4 +206,51 @@ export class ManagedPage<T extends PageUIInfo> extends PageUI<T> {
         }
         return new Promise(resolve => resolve(true));
     }
+
+
+    getPageDetail(): PageDetailDto {
+        return undefined;
+    }
+
+    getTableIds(): Array<number> {
+        return undefined;
+    }
+
+    reload(): void {
+    }
+
+    setButtons(buttons: Array<MenuButtonDto>) {
+    }
+
+    setManageCenter(manageCenter: IManageCenter) {
+        this.manageCenter = manageCenter;
+        let subManagedUI = this.getSubManagedUI();
+        if (subManagedUI) {
+            for (let ui of subManagedUI) {
+                ui.setManageCenter(manageCenter);
+            }
+        }
+    }
+
+    //以下的事件不需要响应,由子界面响应
+    attrChanged(source: any, tableId: number, mapKeyAndValue: object, field: string, value: any) {
+    }
+
+    btnClicked(source: any, buttonInfo: MenuButtonDto, data): boolean {
+        return false;
+    }
+
+    dataChanged(source: any, tableId, mapKeyAndValue: object, changeType, rowData?: object) {
+    }
+
+    dsSelectChanged(source: any, tableId, mapKeyAndValue, row?) {
+    }
+
+    referenceSelectChanged(source: any, refId, id, isLeaf) {
+    }
+
+    stateChange(source: any, tableId, state: number, extendData?: any) {
+    }
+
+
 }

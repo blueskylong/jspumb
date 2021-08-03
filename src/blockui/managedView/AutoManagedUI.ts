@@ -172,4 +172,10 @@ export interface IManageCenter extends ManagedEventListener {
      * @param callback
      */
     checkAndSave?(rowData: object | Array<object>, dsId, callback: (result) => void);
+
+    getGlobalParams(): object;
+
+    setGlobalParams(obj: object);
+
+
 }

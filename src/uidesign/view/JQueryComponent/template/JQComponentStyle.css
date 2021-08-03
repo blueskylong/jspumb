@@ -117,6 +117,8 @@ OrangeRed	橙红色	#FF4500	255,69,0
     border: 1px solid #9fd312;
     margin: 5px;
     color: #9fd312;
+    z-index: 10;
+    background-color: white;
 }
 
 .card-list .btn-add:hover, .card-list .btn-save:hover {

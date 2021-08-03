@@ -4,7 +4,7 @@ export class FlowLayout<T> extends BaseUI<T> {
     private lstUi: Array<BaseUI<any>> = new Array<BaseUI<any>>();
 
     protected createUI(): HTMLElement {
-        return $("<div class = 'full-width-display flow-layout-panel'></div>").get(0);
+        return $("<div class = 'full-width-display flow-layout-panel row align-top'></div>").get(0);
     }
 
     public addUI(ui: BaseUI<any>) {

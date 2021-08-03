@@ -16,7 +16,7 @@ export class BaseUIDemo<T extends BaseUIDemoInfo> extends BaseUI<T> implements I
     }
 
 
-    checkAndSave(globalInfo: object, callback: (errorInfo: string) => void) {
+    checkAndSaveStep(globalInfo: object, callback: (errorInfo: string) => void) {
         console.log("doSave!");
         return callback(this.properties.err);
     }

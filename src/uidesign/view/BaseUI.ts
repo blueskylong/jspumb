@@ -2,12 +2,14 @@ import {GeneralEventListener} from "../../blockui/event/GeneralEventListener";
 import {StringMap} from "../../common/StringMap";
 import {hasMagic} from "glob";
 import {UiUtils} from "../../common/UiUtils";
+import {Constants} from "../../common/Constants";
 
 export default abstract class BaseUI<T> implements GeneralEventListener {
 
     public static rowHeight = 45;
     protected static UN_VISIBLE_CLASS = "un-visible";
     protected static HIDDEN_CLASS = "hidden";
+    protected static ACTIVE_CLASS = "active";
     protected properties: T;
     protected template: string;
     protected lstReadyListener: Array<(source: any) => void>;
@@ -47,6 +49,7 @@ export default abstract class BaseUI<T> implements GeneralEventListener {
         this.properties = properties;
         this.hashCode = $.hashCode();
         this.initTime = new Date().getTime();
+        this.initStructure();
     }
 
     public fireEvent(type: string, data?, source?, extObj?) {
@@ -56,6 +59,13 @@ export default abstract class BaseUI<T> implements GeneralEventListener {
                 listener.handleEvent(type, data, source, extObj);
             }
         }
+    }
+
+    /**
+     * 在构建函数中调用，用于初始化数据结构
+     */
+    protected  initStructure() {
+
     }
 
     addReadyListener(handler: (source: any) => void) {
@@ -194,7 +204,7 @@ export default abstract class BaseUI<T> implements GeneralEventListener {
         return true;
     }
 
-    isDestroied() {
+    isDestroyed() {
         return this.destroyed;
     }
 
@@ -252,8 +262,20 @@ export default abstract class BaseUI<T> implements GeneralEventListener {
 
     }
 
-    refresh(data?) {
+    /**
+     * 可以用于刷新界面
+     * @param data
+     */
+    renew(data?) {
 
+    }
+
+    addDoubleClickListener(listener: GeneralEventListener) {
+        this.addListener(Constants.GeneralEventType.EVENT_DBL_CLICK, listener);
+    }
+
+    addSelectionListener(listener: GeneralEventListener) {
+        this.addListener(Constants.GeneralEventType.SELECT_CHANGE_EVENT, listener);
     }
 }
 

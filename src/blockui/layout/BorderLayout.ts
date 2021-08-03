@@ -148,19 +148,19 @@ export class BorderLayout<T extends BorderLayoutProperty> extends BaseUI<T> {
     }
 
     destroy(): boolean {
-        if (this.eastUi && !this.eastUi.isDestroied()) {
+        if (this.eastUi && !this.eastUi.isDestroyed()) {
             this.eastUi.destroy();
         }
-        if (this.northUi && !this.northUi.isDestroied()) {
+        if (this.northUi && !this.northUi.isDestroyed()) {
             this.northUi.destroy();
         }
-        if (this.southUi && !this.southUi.isDestroied()) {
+        if (this.southUi && !this.southUi.isDestroyed()) {
             this.southUi.destroy();
         }
-        if (this.westUi && !this.westUi.isDestroied()) {
+        if (this.westUi && !this.westUi.isDestroyed()) {
             this.westUi.destroy();
         }
-        if (this.centerUi && !this.centerUi.isDestroied()) {
+        if (this.centerUi && !this.centerUi.isDestroyed()) {
             this.centerUi.destroy();
         }
         return super.destroy();

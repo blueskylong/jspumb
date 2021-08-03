@@ -15,9 +15,18 @@ export class ManagedUiCenter implements IManageCenter {
 
     protected buttonClickHandler: (btn: MenuButtonDto) => void;
 
+    protected globalParam = {};
+
     constructor(protected schemaId) {
     }
 
+    getGlobalParams(): object {
+        return this.globalParam;
+    }
+
+    setGlobalParams(obj: object) {
+        this.globalParam = obj;
+    }
 
     /**
      * 注册受控件,
@@ -29,8 +38,10 @@ export class ManagedUiCenter implements IManageCenter {
         }
         for (let ui of uis) {
             ui.setManageCenter(this);
+            if (this.lstManagedUI.indexOf(ui) === -1) {
+                this.lstManagedUI.push(ui);
+            }
         }
-        this.lstManagedUI.push(...uis);
     }
 
     /**
@@ -277,6 +288,7 @@ export class ManagedUiCenter implements IManageCenter {
     private checkData(rowData: object | Array<object>, dsId) {
         return true;
     }
+
     //TODO 计算当前表的全局公式，如果有受影响的界面，界面接收后自行更新
 
 };

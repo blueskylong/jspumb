@@ -213,7 +213,7 @@ export class ManagedTreeUI<T extends BlockViewDto> extends TreeUI<T> implements 
         });
     }
 
-    setManageCenter(listener: ManagedEventListener) {
+    setManageCenter(listener: IManageCenter) {
         this.manageCenter = listener;
     }
 

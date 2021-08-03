@@ -13,6 +13,7 @@ export class ApplicationContext {
     private static menuFuncs = {};
     private static validators = new StringMap<IValidator>();
     private static customUis = {};
+    private static stepUI = {};
 
     public static regService(service: any, name?: string) {
         if (!name) {
@@ -47,6 +48,10 @@ export class ApplicationContext {
         return ApplicationContext.customUis[name];
     }
 
+    public static getCustomStepUI(name: string) {
+        return ApplicationContext.stepUI[name];
+    }
+
     public static getValidates() {
         return ApplicationContext.validators.getValues();
     }
@@ -71,6 +76,14 @@ export class ApplicationContext {
         }
         this.customUis[name] = constructor;
     }
+
+    public static regCustomStepUi(name: string, constructor: { new(...args: Array<any>): any }) {
+        if (this.stepUI[name]) {
+            console.log("************** warning![" + name + "] already exists,Replace the old one!***************")
+        }
+        this.stepUI[name] = constructor;
+    }
+
 
     /**
      * 检查typeSuper是typeSub的父类或自己

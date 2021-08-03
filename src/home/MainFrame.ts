@@ -338,7 +338,7 @@ export class MainFrame<T extends HomeInfo> extends BaseUI<T> implements IMainFra
         this.$toolbar = null;
 
         this.menuBar.destroy();
-        if (this.lastFunc != null && !this.lastFunc.isDestroied()) {
+        if (this.lastFunc != null && !this.lastFunc.isDestroyed()) {
             this.lastFunc.destroy();
         }
         this.lastFunc = null;

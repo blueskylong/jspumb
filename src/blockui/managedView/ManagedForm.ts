@@ -173,7 +173,7 @@ export class ManagedForm extends Form implements AutoManagedUI {
         super.onUiDataReady();
     }
 
-    setManageCenter(listener: ManagedEventListener) {
+    setManageCenter(listener: IManageCenter) {
         this.manageCenter = listener;
     }
 

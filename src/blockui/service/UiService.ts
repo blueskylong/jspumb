@@ -202,4 +202,14 @@ export class UiService {
         CommonUtils.handleResponse(NetRequest.axios.post("/dmdata/findTableRows/" + dsId, filter
         ), callback);
     }
+
+    /**
+     * 查询步骤信息
+     * @param stepId
+     * @param callback
+     */
+    static findStepInfo(stepId, callback: (result) => void) {
+        CommonUtils.handleResponse(NetRequest.axios.get("/step/findStepInfo/" + stepId
+        ), callback);
+    }
 }

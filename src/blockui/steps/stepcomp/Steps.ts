@@ -4,6 +4,7 @@ import {StepShowPosition, StepShowType} from "../common/StepConstants";
 import BaseUI from "../../../uidesign/view/BaseUI";
 import {GeneralEventListener} from "../../event/GeneralEventListener";
 import {Constants} from "../../../common/Constants";
+import {UiUtils} from "../../../common/UiUtils";
 
 
 /**
@@ -26,6 +27,19 @@ export class Steps<T extends StepsInfo> extends BaseUI<T> {
     protected createUI(): HTMLElement {
         return $(require("./template/Steps.html")).get(0);
     }
+
+    clearSteps() {
+        this.curIndex = -1;
+        this.lastIndex = -1;
+        if (this.lstStep) {
+            for (let step of this.lstStep) {
+                step.destroy();
+            }
+        }
+        this.lstStep = new Array<Step<StepInfo>>();
+        this.properties.lstStepInfo = new Array<StepInfo>();
+    }
+
 
     /**
      * 当前是否选择的最后一个激活步骤
@@ -71,7 +85,14 @@ export class Steps<T extends StepsInfo> extends BaseUI<T> {
 
             }
         };
-        if (this.properties.lstStepInfo) {
+        this.setSteps(this.properties.lstStepInfo);
+
+    }
+
+    setSteps(steps: Array<StepInfo>) {
+        this.properties.lstStepInfo = steps;
+        if (steps) {
+
             let step: Step<StepInfo>;
             let index = 0;
             let container = this.$element.find(".nav");
@@ -85,7 +106,6 @@ export class Steps<T extends StepsInfo> extends BaseUI<T> {
             }
         }
     }
-
 
     addSelectChangeListener(listener: GeneralEventListener) {
         this.addListener(Constants.GeneralEventType.SELECT_CHANGE_EVENT, listener);
@@ -140,6 +160,7 @@ export class Steps<T extends StepsInfo> extends BaseUI<T> {
                 currentIndex: index
             });
         }
+        UiUtils.fireResizeEvent();
 
     }
 
