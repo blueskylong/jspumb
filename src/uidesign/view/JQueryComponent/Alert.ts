@@ -1,6 +1,5 @@
 import BaseUI from "../BaseUI";
 import * as coco from "coco-message";
-import {Constants} from "../../../common/Constants";
 
 export class Alert<T extends AlertInfo> extends BaseUI<T> {
     static type = {

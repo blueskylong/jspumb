@@ -76,13 +76,13 @@ export class ListUIDemo<T extends BaseUIDemoInfo> extends BaseUI<T> implements I
     }
 
 
-    checkAndSaveStep(globalInfo: object, callback: (errorInfo: string) => void) {
+    checkAndSave() {
         console.log("doSave!");
-        return callback(this.properties.err);
+        return new Promise<boolean>(resolve => resolve(true));
     }
 
 
-    getShowCom(globalInfo: object): BaseUI<any> {
+    getShowCom(): BaseUI<any> {
         return this;
     }
 

@@ -287,7 +287,7 @@
 
                     //if position changed call dragEnd
                     if (list.draggedItem.attr("data-origpos") != $(lists).index(list) + "-" + $(list.container).children().index(list.draggedItem))
-                        if (opts.dragEnd.apply(opts,list.draggedItem) == false) { //if dragEnd returns false revert order
+                        if (opts.dragEnd.apply(opts, list.draggedItem) == false) { //if dragEnd returns false revert order
                             var pos = list.draggedItem.attr("data-origpos").split('-');
                             var nextItem = $(lists[pos[0]].container).children().not(list.draggedItem).eq(pos[1]);
                             if (nextItem.length > 0)

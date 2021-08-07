@@ -22,7 +22,7 @@ import {MenuButtonDto} from "../../sysfunc/menu/dto/MenuButtonDto";
  * 此表单只响应列表或树选中情况下的显示
  * 表单只响应本级数据源的变化
  */
-export class ManagedPage<T extends PageUIInfo> extends PageUI<T> implements AutoManagedUI {
+export class ManagedPage<T extends PageUIInfo> extends PageUI<T>  {
     protected pageDetail: PageDetailDto;
     private lstSubManagedUI: Array<AutoManagedUI>;
     private manageCenter: IManageCenter;
@@ -208,19 +208,7 @@ export class ManagedPage<T extends PageUIInfo> extends PageUI<T> implements Auto
     }
 
 
-    getPageDetail(): PageDetailDto {
-        return undefined;
-    }
 
-    getTableIds(): Array<number> {
-        return undefined;
-    }
-
-    reload(): void {
-    }
-
-    setButtons(buttons: Array<MenuButtonDto>) {
-    }
 
     setManageCenter(manageCenter: IManageCenter) {
         this.manageCenter = manageCenter;
@@ -232,24 +220,13 @@ export class ManagedPage<T extends PageUIInfo> extends PageUI<T> implements Auto
         }
     }
 
-    //以下的事件不需要响应,由子界面响应
-    attrChanged(source: any, tableId: number, mapKeyAndValue: object, field: string, value: any) {
-    }
 
-    btnClicked(source: any, buttonInfo: MenuButtonDto, data): boolean {
-        return false;
-    }
 
-    dataChanged(source: any, tableId, mapKeyAndValue: object, changeType, rowData?: object) {
-    }
-
-    dsSelectChanged(source: any, tableId, mapKeyAndValue, row?) {
-    }
-
-    referenceSelectChanged(source: any, refId, id, isLeaf) {
-    }
-
-    stateChange(source: any, tableId, state: number, extendData?: any) {
+    destroy(): boolean {
+        this.pageDetail = null;
+        this.lstSubManagedUI = null;
+        this.manageCenter = null;
+        return super.destroy();
     }
 
 

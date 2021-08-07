@@ -39,7 +39,9 @@
     background-color: #f6f6f6;
     color: #444444;
 }
-
+.step-arrow .nav-item .step-title{
+    min-height: 39px;
+}
 .step-arrow.unhover li:not(.read-only) a:hover:before,
 .step-arrow.unhover li a:focus:before {
     background-color: #d2d2d2;

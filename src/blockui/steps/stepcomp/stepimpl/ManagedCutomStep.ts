@@ -25,29 +25,8 @@ export class ManagedCustomStep<T extends StepDetail> extends BaseComponent<T> im
         return this.customUi.getViewUI();
     }
 
-    checkAndSaveStep(globalInfo: StepGlobalInfo, callback: (errorInfo: string) => void) {
-        callback(null);
-    }
 
-    getSubManagedUI(): Array<AutoManagedUI> {
-        if (typeof this.customUi["getSubManagedUI"] === 'function') {
-            return this.customUi["getSubManagedUI"]();
-        }
-        if (ManagedPage.isAutoManagedUI(this.customUi)) {
-            return [this.customUi as any];
-        }
-        return null;
-
-    }
-
-    getCommonButtons(): Array<ButtonInfo> {
-        if (typeof this.customUi['getCommonButtons'] === 'function') {
-            return this.customUi['getCommonButtons']();
-        }
-        return null;
-    }
-
-    getShowCom(globalInfo: StepGlobalInfo): BaseUI<any> {
+    getShowCom(): BaseUI<any> {
         return this.customUi;
     }
 
@@ -57,18 +36,8 @@ export class ManagedCustomStep<T extends StepDetail> extends BaseComponent<T> im
         }
     }
 
-
-    attrChanged(source: any, tableId: number, mapKeyAndValue: object, field: string, value: any) {
-        if (typeof this.customUi['attrChanged'] === 'function') {
-            this.customUi['attrChanged'](source, tableId, mapKeyAndValue, field, value);
-        }
-    }
-
-    btnClicked(source: any, buttonInfo: MenuButtonDto, data): boolean {
-        if (typeof this.customUi['btnClicked'] === 'function') {
-            this.customUi['btnClicked'](source, buttonInfo, data);
-        }
-        return false;
+    getCommonButtons(callBack: (btns: Array<ButtonInfo>) => void) {
+        return null;
     }
 
     checkAndSave(): Promise<boolean> {
@@ -77,64 +46,5 @@ export class ManagedCustomStep<T extends StepDetail> extends BaseComponent<T> im
         }
         return new Promise<boolean>(resolve => resolve(true));
     }
-
-    dataChanged(source: any, tableId, mapKeyAndValue: object, changeType, rowData?: object) {
-        if (typeof this.customUi['dataChanged'] === 'function') {
-            this.customUi['dataChanged'](source, tableId, mapKeyAndValue, changeType, rowData);
-        }
-    }
-
-    dsSelectChanged(source: any, tableId, mapKeyAndValue, row?) {
-        if (typeof this.customUi['dsSelectChanged'] === 'function') {
-            this.customUi['dsSelectChanged'](source, tableId, mapKeyAndValue);
-        }
-    }
-
-    getPageDetail(): PageDetailDto {
-        if (typeof this.customUi['getPageDetail'] === 'function') {
-            return this.customUi['getPageDetail']();
-        }
-        return null;
-    }
-
-    getTableIds(): Array<number> {
-        if (typeof this.customUi['getTableIds'] === 'function') {
-            return this.customUi['getTableIds']();
-        }
-        return null;
-    }
-
-    getUiDataNum(): number {
-        if (typeof this.customUi['getUiDataNum'] === 'function') {
-            return this.customUi['getUiDataNum']();
-        }
-        return 0;
-    }
-
-    referenceSelectChanged(source: any, refId, id, isLeaf) {
-        if (typeof this.customUi['referenceSelectChanged'] === 'function') {
-            this.customUi['referenceSelectChanged'](source, refId, id, isLeaf);
-        }
-    }
-
-    reload(): void {
-        if (typeof this.customUi['reload'] === 'function') {
-            this.customUi['reload']();
-        }
-    }
-
-    setButtons(buttons: Array<MenuButtonDto>) {
-        if (typeof this.customUi['setButtons'] === 'function') {
-            return this.customUi['setButtons']();
-        }
-    }
-
-    stateChange(source: any, tableId, state: number, extendData?: any) {
-        if (typeof this.customUi['stateChange'] === 'function') {
-            this.customUi['stateChange'](source, tableId, state, extendData);
-        }
-    }
-
-
 }
 

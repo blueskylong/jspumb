@@ -25,8 +25,9 @@ export class Table extends BaseComponent<TableRenderProvider> {
     /**
      * 行ID的字段名
      * 注意这里的要和数据表中的ID字段区分
+     * 添加 下划线,是因为如果数据字段中有些ID列,则会造成选择上错误,如果ID字段有重复值的话,如通用选择项的功能时就有这种现象
      */
-    public static ID_FIELD = "id";
+    public static ID_FIELD = "id_";
 
     private isMaskChange = false;
     protected static EVENT_UI_READY = "UI_READY_EVENT";

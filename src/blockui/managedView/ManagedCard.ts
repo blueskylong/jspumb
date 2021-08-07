@@ -194,7 +194,7 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
                 if (!this.managedEventListener || this.dsIds.length != 1) {//只有单一数据源时,才做处理
                     return;
                 }
-                this.managedEventListener.dsSelectChanged(this, this.dsIds[0], ManagedUITools.getDsKeyValue(this.dsIds[0], row), row);
+                this.managedEventListener.dsSelectChanged && this.managedEventListener.dsSelectChanged(this, this.dsIds[0], ManagedUITools.getDsKeyValue(this.dsIds[0], row), row);
             }
         });
         super.afterComponentAssemble();
@@ -285,7 +285,7 @@ export class ManagedCard<T extends BlockViewDto> extends CardList<T> implements 
     }
 
     async save(): Promise<boolean> {
-        if(!this.editable){
+        if (!this.editable) {
             return new Promise(resolve => resolve(true));
         }
         if (!this.check()) {

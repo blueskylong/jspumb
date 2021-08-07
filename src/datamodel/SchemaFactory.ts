@@ -40,6 +40,17 @@ export class SchemaFactory {
         return SchemaFactory.CACHE_SCHEMA.get(CommonUtils.genKey(schemaId, version));
     }
 
+    static getSchemas(version: string): Array<Schema> {
+        let values = SchemaFactory.CACHE_SCHEMA.getValues();
+        let result = new Array<Schema>();
+        for (let schema of values) {
+            if (schema.getSchemaDto().versionCode === version) {
+                result.push(schema)
+            }
+        }
+        return result;
+    }
+
     /**
      * 是否加载完成
      */

@@ -187,7 +187,7 @@ export class Select<T extends Component> extends TextInput<T> {
 
     protected createEditor(id: string) {
         // @ts-ignore
-        return $("<select class='com-editor form-control selectpicker'" +
+        return $("<select class='com-editor form-control selectpicker col-'" +
             " name='" + this.properties.column.getColumnDto().fieldName + "' data-size='5' id='" + id +
             "'><option></option></select>");
     }

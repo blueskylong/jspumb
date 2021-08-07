@@ -1,6 +1,5 @@
 import {GeneralEventListener} from "../../blockui/event/GeneralEventListener";
 import {StringMap} from "../../common/StringMap";
-import {hasMagic} from "glob";
 import {UiUtils} from "../../common/UiUtils";
 import {Constants} from "../../common/Constants";
 
@@ -64,7 +63,7 @@ export default abstract class BaseUI<T> implements GeneralEventListener {
     /**
      * 在构建函数中调用，用于初始化数据结构
      */
-    protected  initStructure() {
+    protected initStructure() {
 
     }
 
@@ -114,22 +113,29 @@ export default abstract class BaseUI<T> implements GeneralEventListener {
      * 取得视图的组件
      */
     public getViewUI(): HTMLElement {
-        if (!this.element) {
-            this.element = this.createUI();
-            this.$element = $(this.element);
-            this.initSubControls();
-            this.initEvent();
-            DomAssembleNotifier.getInstance().addWaitingUI(this);
-        }
-        //这个在代码压缩后，就不起作用了
-        let compType = this.constructor.name;
-        if (this['getEditorType'] && typeof this['getEditorType'] === 'function') {
-            compType = this["getEditorType"]();
-        }
-        this.$element.attr("component-class", compType);
-        this.$element.attr("hashcode", this.hashCode);
+        try {
+            if (!this.element) {
+                this.element = this.createUI();
+                this.$element = $(this.element);
+                this.initSubControls();
+                this.initEvent();
+                DomAssembleNotifier.getInstance().addWaitingUI(this);
+            }
+            //这个在代码压缩后，就不起作用了
+            let compType = this.constructor.name;
+            if (this['getEditorType'] && typeof this['getEditorType'] === 'function') {
+                compType = this["getEditorType"]();
+            }
+            this.$element.attr("component-class", compType);
+            this.$element.attr("hashcode", this.hashCode);
 
-        return this.element;
+            return this.element;
+        } catch (e) {
+            let panel = BaseUI.createFullPanel("error");
+            panel.text("生成界面失败：" + e.message);
+            UiUtils.hideMask();
+            return panel.get(0);
+        }
     }
 
     protected initSubControls() {

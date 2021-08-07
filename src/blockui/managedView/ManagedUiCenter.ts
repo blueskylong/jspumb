@@ -5,19 +5,25 @@ import {MenuButtonDto} from "../../sysfunc/menu/dto/MenuButtonDto";
 import {Constants} from "../../common/Constants";
 import {ButtonInfo} from "../../uidesign/view/JQueryComponent/Toolbar";
 import {UiService} from "../service/UiService";
+import {Schema} from "../../datamodel/DmRuntime/Schema";
+import {MenuFunction} from "../MenuFunction";
+import {ManagedFunc} from "../ManagedFunc";
+import {MenuInfo} from "../../sysfunc/menu/dto/MenuInfo";
 
 
 /**
  * 受控件的管理中心
  */
 export class ManagedUiCenter implements IManageCenter {
+    protected lstMenuFuc: Array<ManagedFunc<MenuInfo>> = new Array<ManagedFunc<MenuInfo>>();
+
     protected lstManagedUI: Array<AutoManagedUI> = new Array<AutoManagedUI>();
 
     protected buttonClickHandler: (btn: MenuButtonDto) => void;
 
     protected globalParam = {};
 
-    constructor(protected schemaId) {
+    constructor(protected schemaId?) {
     }
 
     getGlobalParams(): object {
@@ -29,17 +35,42 @@ export class ManagedUiCenter implements IManageCenter {
     }
 
     /**
+     * 注册功能,跨功能时需要注册
+     * @param func
+     */
+    registerMenuFunc(func: ManagedFunc<MenuInfo>) {
+        this.lstMenuFuc.push(func);
+        this.registerManagedUI(func.getPage().getSubManagedUI(), func.getDtoInfo().getMenuDto().menuId);
+    }
+
+    /**
+     * 注册功能,跨功能时需要注册
+     * @param func
+     */
+    unRegisterMenuFunc(func: ManagedFunc<MenuInfo>) {
+        this.lstMenuFuc.splice(this.lstMenuFuc.indexOf(func), 1);
+        this.unRegisterManagedUI(func.getPage().getSubManagedUI());
+    }
+
+    /**
      * 注册受控件,
      * @param uis
      */
-    registerManagedUI(uis: Array<AutoManagedUI>) {
+    registerManagedUI(uis: Array<AutoManagedUI>, menuId?) {
         if (!uis) {
             return;
         }
         for (let ui of uis) {
-            ui.setManageCenter(this);
             if (this.lstManagedUI.indexOf(ui) === -1) {
-                this.lstManagedUI.push(ui);
+                ui.setManageCenter(this);
+                if (menuId) {
+                    //这里设置所属的菜单,是用于后面按钮响应注册时,查询相关处理主体
+                    ui.getPageDetail().belongMenuId = menuId;
+                }
+                //再次确认
+                if (this.lstManagedUI.indexOf(ui) === -1) {
+                    this.lstManagedUI.push(ui);
+                }
             }
         }
     }
@@ -68,13 +99,15 @@ export class ManagedUiCenter implements IManageCenter {
             btn.isUsed = false;
         }
         //需要做二次分发,第一次给单数据类型分发,第二次给集合类型分发,一般情况下,像保存,修改这些按钮优先分配到单数据类型的界面中
+        //如果是多菜单集成的情况,则还要判断菜单是否一致
+        let menuId = btns[0].menuId;
         for (let ui of this.lstManagedUI) {
-            if (ui.getUiDataNum() <= Constants.UIDataNum.one) {
+            if (ui.getUiDataNum() <= Constants.UIDataNum.one && ui.getPageDetail().belongMenuId === menuId) {
                 ui.setButtons(btns);
             }
         }
         for (let ui of this.lstManagedUI) {
-            if (ui.getUiDataNum() >= Constants.UIDataNum.multi) {
+            if (ui.getUiDataNum() >= Constants.UIDataNum.multi && ui.getPageDetail().belongMenuId === menuId) {
                 ui.setButtons(btns);
             }
         }
@@ -209,7 +242,28 @@ export class ManagedUiCenter implements IManageCenter {
     }
 
     private getRelationTablesByRef(schemaId, version, refId): Array<number> {
-        let schema = SchemaFactory.getSchema(schemaId, version);
+        if (!schemaId || schemaId <= 0) {
+            //查找所有
+            let schemas = SchemaFactory.getSchemas(version);
+            let result = [];
+            for (let schema of schemas) {
+                let refs = this.findRefInSchema(schema, version, refId);
+                if (refs && refs.length > 0) {
+                    result.push(...refs);
+                }
+            }
+            return result;
+
+        } else {
+            let schema = SchemaFactory.getSchema(schemaId, version);
+            //查找指定
+            return this.findRefInSchema(schema, version, refId);
+        }
+
+    }
+
+    private findRefInSchema(schema: Schema, version, refId) {
+
         let lstTable = schema.getLstTable();
         if (!lstTable) {
             return null;
@@ -226,6 +280,9 @@ export class ManagedUiCenter implements IManageCenter {
     destroy() {
         this.unRegisterManagedUI(this.lstManagedUI);
         this.lstManagedUI = null;
+        this.buttonClickHandler = null;
+        this.globalParam = {};
+        this.lstMenuFuc = null;
     }
 
     /**
@@ -288,6 +345,7 @@ export class ManagedUiCenter implements IManageCenter {
     private checkData(rowData: object | Array<object>, dsId) {
         return true;
     }
+
 
     //TODO 计算当前表的全局公式，如果有受影响的界面，界面接收后自行更新
 

@@ -20,6 +20,7 @@ import {App} from "../App/App";
 
 export class MainFrame<T extends HomeInfo> extends BaseUI<T> implements IMainFrame {
     static cacheType = "menu";
+    static defaultFuncClass = "ManagedFunc";
     private $root: JQuery = null;
     private $menuToggle: JQuery = null;
     // private $sidebarMenu: JQuery = null;
@@ -265,12 +266,8 @@ export class MainFrame<T extends HomeInfo> extends BaseUI<T> implements IMainFra
 
     protected createAndShowFunc(menuInfo: MenuInfo) {
         try {
-            let funcName = menuInfo.getMenuDto().funcName;
-            if (!funcName) {
-                Alert.showMessage("指定的功能不存在");
-                UiUtils.hideMask();
-                return;
-            }
+            let funcName = menuInfo.getMenuDto().funcName || MainFrame.defaultFuncClass;
+
             let funcClazz = ApplicationContext.getMenuFunc(funcName);
             let baseUi = <MenuFunction<any>>BeanFactory.createBean(funcClazz, [menuInfo]);
             this.lastFunc = baseUi;

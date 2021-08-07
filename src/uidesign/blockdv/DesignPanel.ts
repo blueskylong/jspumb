@@ -20,6 +20,7 @@ import {BlockViewDto} from "../dto/BlockViewDto";
 import {DesignTable} from "./DesignTable";
 import {JQueryGeneralComponentGenerator} from "../view/JQueryComponent/JQueryGeneralComponentGenerator";
 import {Form} from "../../blockui/Form";
+import {UiUtils} from "../../common/UiUtils";
 
 /**
  * 设计面板，包含了控件树和控件设计面板。
@@ -591,6 +592,7 @@ export class DesignPanel<T> extends BaseUI<T> {
                 this.height = this.$element.find(".form-body").height();
                 this.width = this.$element.find(".form-body").width();
                 this.fireEvent(EventBus.VALUE_CHANGE_EVENT, {height: this.height, width: this.width});
+                UiUtils.fireResizeEvent();
             }
         });
         //这里设置只会影响设计界面的显示方式,不会写入到后台
@@ -618,27 +620,29 @@ export class DesignPanel<T> extends BaseUI<T> {
     }
 
     private handleContainerSize() {
+        let $formBody = this.$element.find(".form-body");
         let num = this.width;
         if (num > 12) {
-            this.$element.find(".form-body").css("width", num);
+            $formBody.css("width", num);
         } else if (num > 0) {
-            this.$element.find(".form-body").addClass("col-md-" + num);
-            this.$element.find(".form-body").css("width", "auto");
+            $formBody.addClass("col-md-" + num);
+            $formBody.css("width", "auto");
         } else {
-            this.$element.find(".form-body").css("width", "auto");
+            $formBody.css("width", "auto");
         }
         num = this.height;
         if (num > 12) {
-            this.$element.find(".form-body").css("height", num);
+            $formBody.css("height", num);
         } else if (num > 0) {
-            this.$element.find(".form-body").css("height", DesignPanel.rowHeight * num)
+            $formBody.css("height", DesignPanel.rowHeight * num)
 
         } else {
-            this.$element.find(".form-body").css("height", "auto");
+            $formBody.css("height", "auto");
         }
         if (!this.isShowForm) {
-            this.$element.setGridWidth(this.$element.find(".form-body").width());
+            this.$element.setGridWidth($formBody.width());
         }
+        UiUtils.fireResizeEvent();
     }
 
     /**

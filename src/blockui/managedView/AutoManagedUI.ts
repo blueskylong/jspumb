@@ -3,6 +3,8 @@
  */
 import {PageDetailDto} from "../../funcdesign/dto/PageDetailDto";
 import {MenuButtonDto} from "../../sysfunc/menu/dto/MenuButtonDto";
+import {ManagedFunc} from "../ManagedFunc";
+import {MenuInfo} from "../../sysfunc/menu/dto/MenuInfo";
 
 export interface AutoManagedUI extends ManagedEventListener {
     /**
@@ -176,6 +178,14 @@ export interface IManageCenter extends ManagedEventListener {
     getGlobalParams(): object;
 
     setGlobalParams(obj: object);
+
+    registerMenuFunc(func: ManagedFunc<MenuInfo>);
+
+    /**
+     * 注册受控件,
+     * @param uis
+     */
+    registerManagedUI(uis: Array<AutoManagedUI>, menuId?);
 
 
 }

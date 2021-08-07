@@ -21,6 +21,7 @@ import {BootstrapValidator} from "./uiruntime/validator/BootstrapValidator";
 import "jquery-validation"
 import {FormulaCalculator} from "../datamodel/DmRuntime/formula/FormulaCalculator";
 import {ControlFilterResult} from "./uiruntime/ControlFilterInfo";
+import {UiUtils} from "../common/UiUtils";
 
 
 export class Form extends BaseComponent<BlockViewDto> {
@@ -225,6 +226,7 @@ export class Form extends BaseComponent<BlockViewDto> {
         this.updateTitle();
         this.onUiDataReady();
         this.initValidator();
+        UiUtils.fireResizeEvent(this.element);
     }
 
     private initValidator() {
@@ -287,6 +289,7 @@ export class Form extends BaseComponent<BlockViewDto> {
             this.getFormBody().css("height", "100%")
                 .css("overflow", "auto");
         }
+        UiUtils.fireResizeEvent(this.element);
     }
 
     protected onUiDataReady() {

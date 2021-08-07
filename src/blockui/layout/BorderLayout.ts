@@ -2,6 +2,7 @@ import BaseUI from "../../uidesign/view/BaseUI";
 import "./template/BorderLayout.css";
 import {Alert} from "../../uidesign/view/JQueryComponent/Alert";
 import {GeneralEventListener} from "../event/GeneralEventListener";
+import {UiUtils} from "../../common/UiUtils";
 
 export class BorderLayout<T extends BorderLayoutProperty> extends BaseUI<T> {
 
@@ -82,6 +83,7 @@ export class BorderLayout<T extends BorderLayoutProperty> extends BaseUI<T> {
         this.$element.find(".split-pane")['splitPane']();
         this.$element.find(".split-pane").on("resize", () => {
             this.fireEvent(BorderLayout.EVENT_RESIZE);
+            UiUtils.fireResizeEvent();
         });
     }
 

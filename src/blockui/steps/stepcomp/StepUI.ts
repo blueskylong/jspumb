@@ -18,7 +18,6 @@ export class StepUI<T extends StepUIInfo> extends BaseUI<T> {
     private lstUI: Array<BaseUI<any>>;
     private $contentBody: JQuery;
 
-    private globalData: StepGlobalInfo = new StepGlobalInfoImpl();
     /**
      * 用于缓存各步骤，如果需要的话
      */
@@ -86,16 +85,18 @@ export class StepUI<T extends StepUIInfo> extends BaseUI<T> {
     private showUI(index) {
         let stepPage = this.getStepPage(index);
         if (stepPage.children().length === 0) {
-            stepPage.append(this.properties.steps[index].getShowCom(this.globalData).getViewUI());
+            stepPage.append(this.properties.steps[index].getShowCom().getViewUI());
         } else {
-            this.properties.steps[index].getShowCom(this.globalData).renew({})
+            this.properties.steps[index].getShowCom().renew({})
         }
         this.$element.find(".step-page").addClass(StepUI.HIDDEN_CLASS);
         stepPage.removeClass(StepUI.HIDDEN_CLASS);
-        let btns = this.properties.steps[index].getCommonButtons();
-        if (btns) {
-            this.toolbar.addButtonsAdjust(btns);
-        }
+
+        this.properties.steps[index].getCommonButtons((btns => {
+            if (btns) {
+                this.toolbar.addButtonsAdjust(btns);
+            }
+        }));
     }
 
     private initToolbar() {
@@ -199,18 +200,17 @@ export class StepUI<T extends StepUIInfo> extends BaseUI<T> {
                 }
                 return;
             }
-            this.properties.steps[this.steps.getCurrentStepIndex()].checkAndSaveStep(this.globalData,
-                (errorInfo) => {
-                    if (errorInfo) {
-                        Alert.showMessage(errorInfo);
-                        return;
-                    } else {
-                        if (this.steps.canStepNext()) {
-                            this.steps.stepNext();
-                        }
-
+            this.properties.steps[this.steps.getCurrentStepIndex()].checkAndSave().then((bool) => {
+                if (!bool) {
+                    return;
+                } else {
+                    if (this.steps.canStepNext()) {
+                        this.steps.stepNext();
                     }
-                });
+
+                }
+            });
+
 
         }
     }
@@ -219,10 +219,13 @@ export class StepUI<T extends StepUIInfo> extends BaseUI<T> {
         if (index < 0) {
             return;
         }
-        let btns = this.properties.steps[index].getCommonButtons();
-        if (btns) {
-            this.toolbar.removeButtons(btns);
-        }
+        this.properties.steps[index].getCommonButtons((btns) => {
+                if (btns) {
+                    this.toolbar.removeButtons(btns);
+                }
+            }
+        );
+
     }
 
 
@@ -252,11 +255,11 @@ export interface IStep extends StepInfo {
      * 检查并保存,返回的错误信息,如果没有错误信息,则表示成功
      * @param globalInfo
      */
-    checkAndSaveStep(globalInfo: StepGlobalInfo, callback: (errorInfo: string) => void);
+    checkAndSave(): Promise<boolean>;
 
-    getShowCom(globalInfo: StepGlobalInfo): BaseUI<any>;
+    getShowCom(): BaseUI<any>;
 
-    getCommonButtons(): Array<ButtonInfo>;
+    getCommonButtons(callBack: (btns: Array<ButtonInfo>) => void);
 
     needCacheUI?: boolean;
 

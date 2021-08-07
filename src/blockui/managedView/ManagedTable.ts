@@ -272,7 +272,11 @@ export class ManagedTable extends Table implements AutoManagedUI {
 
 
     setManageCenter(listener: IManageCenter) {
+        if (this.manageCenter === listener) {
+            return;
+        }
         this.manageCenter = listener;
+        this.manageCenter.registerManagedUI([this]);
     }
 
     protected async initSubControls() {
@@ -293,7 +297,12 @@ export class ManagedTable extends Table implements AutoManagedUI {
         this.refCols = null;
         this.manageCenter = null;
         this.extFilter = null;
+        this.pageDetail = null;
         this.extFilterTemp = null;
+        this.lstUseBtn = null;
+        this.lstToolBtn = null;
+        this.lstCantNullMasterFields = null;
+        this.mapInterceptor = null;
         return super.destroy();
     }
 

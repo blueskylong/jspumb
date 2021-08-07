@@ -19,4 +19,5 @@ export class PageDetailDto extends BaseDto {
     relationDs: number;
     uiCode: string;//编码,用于手动取得控件
     noFullData: number;//不允许空条件查询
+    belongMenuId?: number;//这是一个虚拟字段
 }

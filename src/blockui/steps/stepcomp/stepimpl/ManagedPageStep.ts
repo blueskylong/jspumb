@@ -14,11 +14,11 @@ export class ManagedPageStep<T extends StepPageUIInfo> extends ManagedPage<T> im
         callback(null);
     }
 
-    getCommonButtons(): Array<ButtonInfo> {
+    getCommonButtons(callBack: (btns: Array<ButtonInfo>) => void) {
         return null;
     }
 
-    getShowCom(globalInfo: StepGlobalInfo): BaseUI<any> {
+    getShowCom(): BaseUI<any> {
         return this;
     }
 

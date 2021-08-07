@@ -75,6 +75,9 @@ export class ManagedCustomPanelContainer<T extends PageDetailDto> extends BaseUI
         }
         //初始化
         let funcClazz = ApplicationContext.getCustomUi(this.properties.customUi);
+        if(!funcClazz){
+            throw new Error("指定的功能类为空！");
+        }
         this.customControl = <AutoManagedUI>BeanFactory.createBean(funcClazz, [this.properties]);
         this.$element.append(this.customControl.getViewUI());
         this.customControl.addReadyListener(() => {

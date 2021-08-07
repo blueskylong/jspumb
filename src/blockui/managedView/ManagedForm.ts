@@ -462,4 +462,15 @@ export class ManagedForm extends Form implements AutoManagedUI {
             }
         }
     }
+
+    destroy(): boolean {
+        this.dsIds = new Array<any>();
+        this.manageCenter = null;
+        this.pageDetail = null;
+        this.state = Constants.UIState.edit;
+        this.getDefaultValue = null;
+        this.lastSelectValue = null;
+        this.mapInterceptor = new StringMap<Array<EventInterceptor>>();
+        return super.destroy();
+    }
 }

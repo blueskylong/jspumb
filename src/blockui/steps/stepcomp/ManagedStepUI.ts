@@ -3,10 +3,12 @@ import {StepConfigInfo} from "./dto/StepConfigInfo";
 import {IStep, StepUI, StepUIInfo} from "./StepUI";
 import {Steps} from "./Steps";
 import {StepDetail} from "./dto/StepDetail";
-import {AutoManagedUI} from "../../managedView/AutoManagedUI";
+import {IManageCenter} from "../../managedView/AutoManagedUI";
 import {ManagedCustomStep} from "./stepimpl/ManagedCutomStep";
 import {ManagedPageStep} from "./stepimpl/ManagedPageStep";
 import {ManagedUiCenter} from "../../managedView/ManagedUiCenter";
+import {MenuStep} from "./stepimpl/MenuStep";
+import {MenuService} from "../../../sysfunc/menu/service/MenuService";
 
 /**
  * 自动管理的步骤全体
@@ -59,14 +61,22 @@ export class ManagedStepUI<T extends StepConfigInfo> extends BaseUI<T> {
             return new Promise(resolve => {
                 let ui = new ManagedCustomStep(detail);
                 ui.addReadyListener(() => {
-                    this.managedUiCenter.registerManagedUI(ui.getSubManagedUI());
+                    ui.setManageCenter(this.managedUiCenter);
                 });
-                resolve();
+                return new Promise(resolve => resolve(ui))
             })
         } else if (detail.pageId) {
             let ui = new ManagedPageStep({pageId: detail.pageId, stepInfo: detail});
             ui.addReadyListener(() => {
                 this.managedUiCenter.registerManagedUI(ui.getSubManagedUI());
+            });
+            return new Promise(resolve => resolve(ui))
+        } else if (detail.menuId) {
+            let menuInfo = await MenuService.findMenuInfoAsync(detail.menuId);
+            menuInfo.stepInfo = detail;
+            let ui = new MenuStep(menuInfo);
+            ui.addReadyListener(() => {
+                this.managedUiCenter.registerMenuFunc(ui);
             });
             return new Promise(resolve => resolve(ui))
         }
@@ -77,9 +87,19 @@ export class ManagedStepUI<T extends StepConfigInfo> extends BaseUI<T> {
         return this.stepUI.getViewUI();
     }
 
+    destroy(): boolean {
+        this.stepUI.destroy();
+        this.stepUI = null;
+        this.lstStepUI = null;
+        this.managedUiCenter.destroy();
+        this.managedUiCenter = null;
+        return super.destroy();
+    }
+
 }
 
 
-export interface IManagedStep extends IStep, AutoManagedUI {
+export interface IManagedStep extends IStep {
+    setManageCenter(manageCenter: IManageCenter);
 
 }

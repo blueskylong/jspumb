@@ -30,7 +30,8 @@ export class ManagedDlg<T extends ManagedDialogInfo> extends Dialog<T> {
             let tableInfo = SchemaFactory.getTableByTableId(this.properties.dsId);
             let viewId = tableInfo.getTableDto().blockViewId;
             if (!viewId) {
-                Alert.showMessage("没有指定显示的内容")
+                Alert.showMessage("没有指定表默认的编辑界面")
+                return;
             }
             await this.showBlock(viewId, this.properties.showType);
 

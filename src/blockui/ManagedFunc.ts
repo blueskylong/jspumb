@@ -15,10 +15,10 @@ import {AutoManagedUI} from "./managedView/AutoManagedUI";
  */
 @MenuFunc("ManagedFunc")
 export class ManagedFunc<T extends MenuInfo> extends MenuFunction<T> {
+    static CENTER_PARAM_NAME = "managerCenter";
+    protected managedUiCenter: ManagedUiCenter;
 
-    private managedUiCenter: ManagedUiCenter;
-
-    private page: ManagedPage<any>;
+    protected page: ManagedPage<any>;
     private isValid = false;
 
     protected createUI(): HTMLElement {
@@ -35,24 +35,28 @@ export class ManagedFunc<T extends MenuInfo> extends MenuFunction<T> {
             return;
         }
         let schemaId = await ManagedUITools.getPageSchema(this.properties.getMenuDto().pageId, GlobalParams.getLoginUser());
+        if (!this.properties[ManagedFunc.CENTER_PARAM_NAME]) {
+            this.managedUiCenter = new ManagedUiCenter(schemaId);
+            this.managedUiCenter.setButtonClickHandler((btn: MenuButtonDto) => {
+                this.handleButtonClick(btn);
+            });
+        } else {
+            this.managedUiCenter = this.properties[ManagedFunc.CENTER_PARAM_NAME];
+        }
 
-        this.managedUiCenter = new ManagedUiCenter(schemaId);
-        this.managedUiCenter.setButtonClickHandler((btn: MenuButtonDto) => {
-            this.handleButtonClick(btn);
-        });
         //显示配置界面
         this.page = ManagedPage.getManagedInstance(this.properties.getMenuDto().pageId, null);
         this.$element.append(this.page.getViewUI());
         this.page.addReadyListener((source) => {
-            this.managedUiCenter.registerManagedUI(this.page.getSubManagedUI());
+            this.managedUiCenter.registerMenuFunc(this);
             this.fireReadyEvent();
             this.uiReady();
         });
         this.isValid = true;
     }
 
-    private distributeButtons() {
-        this.managedUiCenter.distributeButtons(this.properties.getLstBtns());
+    getPage() {
+        return this.page;
     }
 
     /**
@@ -94,8 +98,10 @@ export class ManagedFunc<T extends MenuInfo> extends MenuFunction<T> {
     }
 
     destroy(): boolean {
-        if (this.managedUiCenter) {
+        if (this.managedUiCenter && !this.properties[ManagedFunc.CENTER_PARAM_NAME]) {
             this.managedUiCenter.destroy();
+        } else {
+            this.managedUiCenter.unRegisterMenuFunc(this);
         }
         this.managedUiCenter = null;
         if (this.page) {

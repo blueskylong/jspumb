@@ -37,12 +37,15 @@ export class BaseUIDemo<T extends BaseUIDemoInfo> extends BaseUI<T> implements I
         return null;
     }
 
-    getShowCom(globalInfo: object): BaseUI<any> {
+    getShowCom(): BaseUI<any> {
 
         return this;
     }
 
-
+    checkAndSave(): Promise<boolean> {
+        console.log("doSave!");
+        return new Promise<boolean>(resolve => resolve(true));
+    }
 }
 
 export interface BaseUIDemoInfo {

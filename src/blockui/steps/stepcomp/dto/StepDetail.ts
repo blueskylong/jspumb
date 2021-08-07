@@ -9,4 +9,5 @@ export class StepDetail extends BaseDto {
     pageId: number;
     customStep: string;
     params: string;
+    menuId: number;
 }

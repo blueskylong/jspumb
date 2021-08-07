@@ -214,6 +214,7 @@ export class CardList<T extends BlockViewDto> extends BaseComponent<T> {
         this.sortable = sortable;
         if (this.sortable) {
             this.$element['dragsort']({
+                dragSelectorExclude: "input, textarea,.form-body",
                 dragEnd: () => {
                     let lstForm = this.lstForm;
                     this.lstForm = new Array<Form>();
@@ -464,5 +465,19 @@ export class CardList<T extends BlockViewDto> extends BaseComponent<T> {
         return true;
     }
 
+    destroy(): boolean {
+        this.curForm = null;
+        this.values = null;
+        this.beforeAdd = null;
+        this.lstSelectChangeListener = null;
+        this.viewer = null;
+        if (this.lstForm) {
+            for (let form of this.lstForm) {
+                form.destroy();
+            }
+            this.$element['dragsort']("destroy")
+        }
+        return super.destroy();
+    }
 
 }
