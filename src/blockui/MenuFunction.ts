@@ -16,7 +16,7 @@ export abstract class MenuFunction<T extends MenuInfo> extends BaseUI<T> {
         return null;
     }
 
-    handleButtonClick(btn: MenuButtonDto) {
+    handleButtonClick(btn: MenuButtonDto, source) {
         if (this[btn.funcName] && typeof this[btn.funcName] === "function") {
             this[btn.funcName]();
         }

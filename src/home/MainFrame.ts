@@ -306,7 +306,7 @@ export class MainFrame<T extends HomeInfo> extends BaseUI<T> implements IMainFra
                         (btn.iconClass ? "<span class='" + btn.iconClass + "'></span>" : "")
                         + (btn.title ? btn.title : "") + "</button>");
                     $btn.on("click", (event) => {
-                        this.lastFunc.handleButtonClick(btn);
+                        this.lastFunc.handleButtonClick(btn, this);
                     });
                     this.$toolbar.append($btn);
                 }

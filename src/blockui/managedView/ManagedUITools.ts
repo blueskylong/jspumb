@@ -34,6 +34,7 @@ export class ManagedUITools {
         let tableInfo = SchemaFactory.getTableByTableId(tableId);
         let columns = tableInfo.getKeyColumns();
         if (!columns || columns.length == 0) {
+            console.log("数据表没有主键:" + tableId);
             Alert.showMessage("数据表没有主键");
             return null;
         }
@@ -232,6 +233,7 @@ export class ManagedUITools {
         let tableInfo = SchemaFactory.getTableByTableId(tableId);
         let columns = tableInfo.getKeyColumns();
         if (!columns || columns.length == 0) {
+            console.log("数据表没有主键:" + tableId);
             Alert.showMessage("数据表没有主键");
             return null;
         }

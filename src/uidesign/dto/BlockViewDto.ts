@@ -26,5 +26,6 @@ export class BlockViewDto extends BaseDto {
     showHead: number;
     lvlCode: string;
     layoutType: number;
+    fixId: number;
 
 }

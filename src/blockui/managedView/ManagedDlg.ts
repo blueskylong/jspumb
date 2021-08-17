@@ -30,17 +30,18 @@ export class ManagedDlg<T extends ManagedDialogInfo> extends Dialog<T> {
             let tableInfo = SchemaFactory.getTableByTableId(this.properties.dsId);
             let viewId = tableInfo.getTableDto().blockViewId;
             if (!viewId) {
-                Alert.showMessage("没有指定表默认的编辑界面")
+                Alert.showMessage("没有指定表默认的编辑界面");
                 return;
             }
             await this.showBlock(viewId, this.properties.showType);
 
+        } else if (this.properties.viewer) {
+            await this.showBlockViewer(this.properties.viewer, this.properties.showType);
         } else {
-            Alert.showMessage("数据表没有指定默认的展示界面");
+            Alert.showMessage("没有指定表默认的编辑界面");
+            return;
         }
         this.$element.find(".sub-ui").append(this.ui.getViewUI());
-
-
         this.ui.addReadyListener(() => {
             this.doOperation();
         });
@@ -87,13 +88,18 @@ export class ManagedDlg<T extends ManagedDialogInfo> extends Dialog<T> {
     }
 
     private async showBlock(blockViewId, showType) {
-        let pageDetail = new PageDetailDto();
+
         let viewer: BlockViewer = await UiService.getSchemaViewer(blockViewId);
+        this.showBlockViewer(viewer, showType);
+    }
+
+    showBlockViewer(viewer: BlockViewer, showType) {
         showType = showType || viewer.getBlockViewDto().defaultShowType;
+        let pageDetail = new PageDetailDto();
         pageDetail.loadOnshow = 0;
-        pageDetail.viewId = blockViewId;
+        pageDetail.viewId = viewer.getBlockViewDto().blockViewId;
         if (showType === Constants.DispType.table) {
-            this.ui = ManagedTable.getManagedInstance(new ServerRenderProvider(blockViewId), pageDetail);
+            this.ui = ManagedTable.getManagedInstance(new ServerRenderProvider(viewer.getBlockViewDto().blockViewId), pageDetail);
         } else if (showType === Constants.DispType.tree) {
             this.ui = ManagedTreeUI.getManagedInstance(pageDetail);
         } else if (showType === Constants.DispType.card) {
@@ -117,6 +123,7 @@ export interface ManagedDialogInfo extends DialogInfo {
     initValue: object;//初始化数据,如果新增,则是界面选择的相关数据,如果是查看,则是ID,如果是修改,则也是ID
     operType: number;//操作类型,查看,修改,增加 参见: Constants.TableOperatorType
     blockViewId?: number;//指定显示的视图 与DSID相同，此参数优先级高于数据表默认编辑界面的设定．
+    viewer?: BlockViewer;//可以直接指定视图内容
     showType?: number;//指定显示类型
     callback?(result: boolean, rowId?): void;
 }

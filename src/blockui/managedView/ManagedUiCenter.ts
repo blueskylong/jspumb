@@ -19,7 +19,7 @@ export class ManagedUiCenter implements IManageCenter {
 
     protected lstManagedUI: Array<AutoManagedUI> = new Array<AutoManagedUI>();
 
-    protected buttonClickHandler: (btn: MenuButtonDto) => void;
+    protected buttonClickHandler: (btn: MenuButtonDto, source) => void;
 
     protected globalParam = {};
 
@@ -307,13 +307,13 @@ export class ManagedUiCenter implements IManageCenter {
 
         }
         if (this.buttonClickHandler) {
-            this.buttonClickHandler(buttonInfo);
+            this.buttonClickHandler(buttonInfo, source);
         }
         //这个返回结果没有地方应用
         return true;
     }
 
-    setButtonClickHandler(handler: (btn: MenuButtonDto) => void) {
+    setButtonClickHandler(handler: (btn: MenuButtonDto, source) => void) {
         this.buttonClickHandler = handler;
     }
 

@@ -226,8 +226,9 @@ export class Form extends BaseComponent<BlockViewDto> {
         this.updateTitle();
         this.onUiDataReady();
         this.initValidator();
-        UiUtils.fireResizeEvent(this.element);
+
     }
+
 
     private initValidator() {
         if (!this.isLocal) {
@@ -236,6 +237,14 @@ export class Form extends BaseComponent<BlockViewDto> {
         }
     }
 
+
+    afterComponentAssemble(): void {
+        setTimeout(() => {
+            UiUtils.fireResizeEvent(this.element);
+        }, 500);
+
+        super.afterComponentAssemble();
+    }
 
     public check() {
         return this.$formBody.valid();
@@ -569,6 +578,9 @@ export class Form extends BaseComponent<BlockViewDto> {
      * 由于此类计算少，所以就直接遍历计算
      */
     private async calcControlFilter(fieldWhoChanged: string) {
+        if (!this.formulaCalculator) {
+            return;
+        }
         let fieldId = this.viewer.findFieldIdByName(fieldWhoChanged);
         let newData = this.getValue();
         let controlInfo = await this.formulaCalculator.calcFilterOnFieldChange(fieldId, newData);

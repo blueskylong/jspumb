@@ -334,4 +334,27 @@ export class Schema {
         }
         return null;
     }
+
+    /**
+     * 查找主数据源ID，可能是多个
+     * @param dsId
+     */
+    findMasterDsId(dsId: number): Array<number> {
+        let tableInfo = this.findTableById(dsId);
+        let lstRelation = this.getLstRelation();
+        if (!lstRelation) {
+            return null;
+        }
+        let result = [];
+        for (let relation of lstRelation) {
+            if (relation.getTableFrom().getTableDto().tableId === dsId
+                && relation.getDto().relationType === DmConstants.RelationType.multiToOne) {
+                result.push(relation.getTableTo().getTableDto().tableId)
+            } else if (relation.getTableTo().getTableDto().tableId === dsId
+                && relation.getDto().relationType === DmConstants.RelationType.oneToMulti) {
+                result.push(relation.getTableFrom().getTableDto().tableId)
+            }
+        }
+        return result;
+    }
 }

@@ -1,4 +1,4 @@
-import BaseUI from "../../../uidesign/view/BaseUI";
+ import BaseUI from "../../../uidesign/view/BaseUI";
 import {StepConfigInfo} from "./dto/StepConfigInfo";
 import {IStep, StepUI, StepUIInfo} from "./StepUI";
 import {Steps} from "./Steps";

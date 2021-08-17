@@ -131,14 +131,13 @@ export default class PageUI<T extends PageUIInfo> extends BaseComponent<T> {
             proper.westWidth = Math.min(width, defaultLayout.westWidth);
             width = width - proper.westWidth;
         }
-        if (proper.eastWidth == 1) {
-            proper.eastWidth = Math.min(width, defaultLayout.eastWidth);
-            width = width - proper.eastWidth;
-        }
-
         if (proper.centerWidth == 1) {
             proper.centerWidth = width;
+        } else if (proper.eastWidth == 1) {
+            proper.eastWidth = width
         }
+
+
         //计算高度--------------------------------------
         let totalHeight = this.$element.height();
         let height = 1;

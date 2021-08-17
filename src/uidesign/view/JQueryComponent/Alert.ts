@@ -65,5 +65,5 @@ coco.config({
 export interface AlertInfo {
     message: string,
     position?: string,
-    type?: string
+    type?: string,
 }

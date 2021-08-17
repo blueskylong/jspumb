@@ -40,6 +40,8 @@ export class Table extends BaseComponent<TableRenderProvider> {
     private toolBtns: Array<ButtonInfo>;
     private lastRowId = null;
 
+    private jqOptions: FreeJqGrid.JqGridOptions;
+
 
     /**
      * 是不是宽度是父亲的百分百
@@ -108,8 +110,8 @@ export class Table extends BaseComponent<TableRenderProvider> {
         return this.isEditable;
     }
 
-    protected getExtColModel(): Array<ColumnModel> {
-        return null;
+    protected getExtColModel(): Promise<Array<ColumnModel>> {
+        return new Promise<Array<ColumnModel>>(resolve => resolve(null));
     }
 
     public setEditable(editable) {
@@ -119,7 +121,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
         this.$element.trigger("reloadGrid");
     }
 
-    addColumn(colModel: ColumnModel) {
+    addColumn(colModel: ColumnModel | Array<ColumnModel>) {
         let newColModel = this.$element.jqGrid("getGridParam", "colModel")
             .concat(colModel);
         this.$element.jqGrid("setGridParam", {colModel: newColModel}).trigger("reloadGrid");
@@ -133,7 +135,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
         this.addListener(Constants.GeneralEventType.SELECT_CHANGE_EVENT, listener);
     }
 
-    private colmunNavHandler(d: any, e: any) {
+    private columnNavHandler(d: any, e: any) {
         const {colModel, colNames} = this.$element.jqGrid('getGridParam');
         let values = [], options: Array<any> = [{
             id: '_all',
@@ -264,10 +266,12 @@ export class Table extends BaseComponent<TableRenderProvider> {
         this.updateButtonEvent();
     }
 
-    addRow(rowData: any, rowId?: string) {
+    addRow(rowData: any, rowId?: string, position?: FreeJqGrid.AddRowDataPosition) {
         let id = rowId ? rowId : CommonUtils.genUUID();
-        this.$element.addRowData(rowId, rowData);
+        this.$element.addRowData(rowId, rowData, position);
+        this.updateButtonEvent();
     }
+
 
     clearData() {
         this.$element.clearGridData(true);
@@ -277,8 +281,16 @@ export class Table extends BaseComponent<TableRenderProvider> {
      * 获取表数据
      * @returns {any}
      */
-    getData() {
-        return this.$element.getRowData(undefined, {includeId: true, skipHidden: false});
+    getData(needFilter = false): Array<Object> {
+        let result = this.$element.getRowData(undefined, {includeId: true, skipHidden: false}) as Array<Object>;
+        if (needFilter && result) {
+            let filterResult = [];
+            result.forEach((row, index) => {
+                filterResult.push(this.filterOptionData(row));
+            })
+            return filterResult;
+        }
+        return result;
     }
 
     /**
@@ -348,7 +360,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
      */
     getRowData(rowid: string | string[]): object | Array<object> {
         if (typeof rowid === "string") {
-            return this.$element.getRowData(rowid);
+            return this.$element.getRowData(rowid, {includeId: true});
         } else {
             let arrResult = new Array<any>();
             for (let oneRow of rowid) {
@@ -395,7 +407,13 @@ export class Table extends BaseComponent<TableRenderProvider> {
      * @param rowdata
      */
     setRowData(rowid: string, rowdata) {
-        return this.$element.setRowData(rowid, rowdata);
+        let result = this.$element.setRowData(rowid, rowdata);
+        if (result) {
+            this.updateButtonEvent(rowid);
+        }
+        return result;
+
+
     }
 
     /**
@@ -621,15 +639,15 @@ export class Table extends BaseComponent<TableRenderProvider> {
         }
     }
 
-    protected async initSubControls() {
+    protected async initSubControls(colModels?) {
         this.hasShow = true;
         let option = await this.properties.getOptions(this);
         let multiSelect = option.multiselect;
         this.isAutoFitWidth = !!option.autowidth;
         this.isAutoHeight = !!option.autowidth;
 
-        let param: FreeJqGrid.JqGridOptions = {colModel: []};
-        param = $.extend(true, {
+        this.jqOptions = {colModel: []};
+        this.jqOptions = $.extend(true, {
                 onSelectRow: (rowid: string, state: boolean, eventObject: JQuery.Event) => {
                     this.onSelectRow(rowid, state, eventObject);
                 },
@@ -643,17 +661,20 @@ export class Table extends BaseComponent<TableRenderProvider> {
             },
             option
         );
-        let extCol = this.getExtColModel();
-        if (extCol && extCol.length > 0) {
-            param.colModel.push(...extCol);
+        if (colModels) {
+            this.jqOptions.colModel = colModels;
         }
-        param = $.extend(true, param, this.properties);
-        if (param.pager) {
-            param.pager = "#" + this.getPagerId();
+        let extCol = await this.getExtColModel();
+        if (extCol && extCol.length > 0) {
+            this.jqOptions.colModel.push(...extCol);
+        }
+        this.jqOptions = $.extend(true, this.jqOptions, this.properties);
+        if (this.jqOptions.pager) {
+            this.jqOptions.pager = "#" + this.getPagerId();
         }
 
         //如果是指定后台生成,则取数据
-        this.$element = this.$element.find(".jq-table").jqGrid(param);
+        this.$element = this.$element.find(".jq-table").jqGrid(this.jqOptions);
         let createEl = $.jgrid.createEl;
         let table = this.$element;
         $.jgrid.createEl = (elementType: string, options: any, value: string, autoWidth?: boolean, ajaxso?: any) => {
@@ -670,11 +691,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
         if (!option.hideSearch) {
             this.showSearch(true);
         }
-        // this.$element.setFrozenColumns({
-        //     mouseWheel: () => {
-        //         return 1;
-        //     }
-        // });
+
         this.hideOperatorCol();
         this.ready = true;
         this.$element
@@ -719,6 +736,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
     destroy(): boolean {
         this.$element.GridUnload();
         this.$element = this.$fullElement;
+        this.jqOptions = null;
         this.$fullElement = null;
         $(window).off("." + this.hashCode);
         return super.destroy();
@@ -742,8 +760,13 @@ export class Table extends BaseComponent<TableRenderProvider> {
     }
 
     //更新操作按钮的事件
-    protected updateButtonEvent() {
-        this.$fullElement.find("." + Table.TOOLBAR_BUTTON_CLASS)
+    protected updateButtonEvent(rowId?) {
+        let $ele = this.$fullElement;
+        if (rowId) {
+            $ele = this.$fullElement.find("#" + rowId);
+        }
+        $ele.find("." + Table.TOOLBAR_BUTTON_CLASS).off("click")
+        $ele.find("." + Table.TOOLBAR_BUTTON_CLASS)
             .on("click", (event) => {
                 if (!this.colBtns) {
                     return;

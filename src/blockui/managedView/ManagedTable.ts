@@ -40,7 +40,7 @@ export class ManagedTable extends Table implements AutoManagedUI {
     /**
      * 额外按钮事件处理插件
      */
-    private static mapEventHandler = new StringMap<IEventHandler>();
+    public static mapEventHandler = new StringMap<IEventHandler>();
     /**
      * 额外表格完成时执行机会
      */
@@ -54,6 +54,7 @@ export class ManagedTable extends Table implements AutoManagedUI {
     private firstReady = false;
 
     static getManagedInstance(renderPro: TableRenderProvider, pageDetail: PageDetailDto) {
+
         let table = new ManagedTable(renderPro);
         table.pageDetail = pageDetail;
         table.addReadyListener(() => {
@@ -196,7 +197,7 @@ export class ManagedTable extends Table implements AutoManagedUI {
         }
     }
 
-    protected getExtColModel(): Array<FreeJqGrid.ColumnModel> {
+    protected getExtColModel(): Promise<Array<FreeJqGrid.ColumnModel>> {
         let extCols = new Array<ColumnModel>();
         if (ManagedTable.lstExtColProvider.length > 0) {
             let cols = ManagedTable.findExtCol(this.properties.getBlockInfo());
@@ -204,7 +205,7 @@ export class ManagedTable extends Table implements AutoManagedUI {
                 extCols.push(...cols);
             }
         }
-        return extCols;
+        return new Promise<Array<FreeJqGrid.ColumnModel>>(resolve => resolve(extCols));
     }
 
     dsSelectChanged(source: any, tableId, mapKeyAndValue, row?) {

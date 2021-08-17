@@ -22,7 +22,7 @@ import {MenuButtonDto} from "../../sysfunc/menu/dto/MenuButtonDto";
  * 此表单只响应列表或树选中情况下的显示
  * 表单只响应本级数据源的变化
  */
-export class ManagedPage<T extends PageUIInfo> extends PageUI<T>  {
+export class ManagedPage<T extends PageUIInfo> extends PageUI<T> {
     protected pageDetail: PageDetailDto;
     private lstSubManagedUI: Array<AutoManagedUI>;
     private manageCenter: IManageCenter;
@@ -132,7 +132,11 @@ export class ManagedPage<T extends PageUIInfo> extends PageUI<T>  {
             }
 
             if (showType == Constants.DispType.table) {
-                baseUi = ManagedTable.getManagedInstance(new ServerRenderProvider(blockViewId), pageDetail);
+                let extOption = {} as any;
+                if (pageDetail.customParam) {
+                    extOption = JSON.parse(pageDetail.customParam);
+                }
+                baseUi = ManagedTable.getManagedInstance(new ServerRenderProvider(blockViewId, extOption), pageDetail);
             } else if (showType == Constants.DispType.tree) {
                 let treeInstance = ManagedTreeUI.getManagedInstance(pageDetail);
                 baseUi = treeInstance;
@@ -208,8 +212,6 @@ export class ManagedPage<T extends PageUIInfo> extends PageUI<T>  {
     }
 
 
-
-
     setManageCenter(manageCenter: IManageCenter) {
         this.manageCenter = manageCenter;
         let subManagedUI = this.getSubManagedUI();
@@ -219,7 +221,6 @@ export class ManagedPage<T extends PageUIInfo> extends PageUI<T>  {
             }
         }
     }
-
 
 
     destroy(): boolean {

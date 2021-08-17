@@ -30,11 +30,11 @@ export class BorderLayout<T extends BorderLayoutProperty> extends BaseUI<T> {
         }
     }
 
-    addResizeListenser(listener: GeneralEventListener) {
+    addResizeListener(listener: GeneralEventListener) {
         this.addListener(BorderLayout.EVENT_RESIZE, listener);
     }
 
-    removeResizeListenser(listener: GeneralEventListener) {
+    removeResizeListener(listener: GeneralEventListener) {
         this.removeListener(BorderLayout.EVENT_RESIZE, listener);
     }
 
@@ -95,7 +95,7 @@ export class BorderLayout<T extends BorderLayoutProperty> extends BaseUI<T> {
 
     protected initEvent() {
 
-        this.addResizeListenser({
+        this.addResizeListener({
             handleEvent: (eventType: string, data: any, source: any, extObject?: any) => {
                 this.resize();
             }

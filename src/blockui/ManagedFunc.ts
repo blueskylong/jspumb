@@ -20,6 +20,7 @@ export class ManagedFunc<T extends MenuInfo> extends MenuFunction<T> {
 
     protected page: ManagedPage<any>;
     private isValid = false;
+    private lstUnDockBtn: Array<MenuButtonDto> = null;
 
     protected createUI(): HTMLElement {
         return $(require("./template/FunctionUI.html")).get(0);
@@ -37,8 +38,8 @@ export class ManagedFunc<T extends MenuInfo> extends MenuFunction<T> {
         let schemaId = await ManagedUITools.getPageSchema(this.properties.getMenuDto().pageId, GlobalParams.getLoginUser());
         if (!this.properties[ManagedFunc.CENTER_PARAM_NAME]) {
             this.managedUiCenter = new ManagedUiCenter(schemaId);
-            this.managedUiCenter.setButtonClickHandler((btn: MenuButtonDto) => {
-                this.handleButtonClick(btn);
+            this.managedUiCenter.setButtonClickHandler((btn: MenuButtonDto, source) => {
+                this.handleButtonClick(btn, source);
             });
         } else {
             this.managedUiCenter = this.properties[ManagedFunc.CENTER_PARAM_NAME];
@@ -86,15 +87,18 @@ export class ManagedFunc<T extends MenuInfo> extends MenuFunction<T> {
         if (!this.properties.getLstBtns()) {
             return null;
         }
+        if (this.lstUnDockBtn != null) {
+            return this.lstUnDockBtn;
+        }
         //先由各界面领用
         this.managedUiCenter.distributeButtons(this.properties.getLstBtns());
-        let result = new Array<MenuButtonDto>();
+        this.lstUnDockBtn = new Array<MenuButtonDto>();
         for (let buttonInfo of this.properties.getLstBtns()) {
             if (!buttonInfo.isUsed) {
-                result.push(buttonInfo);
+                this.lstUnDockBtn.push(buttonInfo);
             }
         }
-        return result;
+        return this.lstUnDockBtn;
     }
 
     destroy(): boolean {
@@ -114,7 +118,13 @@ export class ManagedFunc<T extends MenuInfo> extends MenuFunction<T> {
      * 处理
      * @param actionCode
      */
-    handleButtonClick(btn: MenuButtonDto) {
+    handleButtonClick(btn: MenuButtonDto, source) {
+        if (source === this) {
+            return false;
+        }
+        if (this.managedUiCenter.btnClicked(this, btn, {})) {
+            return;
+        }
         if (!btn.funcName) {
             Alert.showMessage("按钮没有指定处理程序");
             return;

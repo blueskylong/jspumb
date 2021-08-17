@@ -24,6 +24,11 @@ import "./sysfunc/user/UserManageUI";
 import "./plugmanage/PlugMangeUI";
 
 import "./blockui/steps";
+import "./fixrowdesign/FixMainUI";
+
+import "./fixrowdesign/FixDataTable"
+
+
 
 
 

@@ -6,8 +6,8 @@ import {CommonUtils} from "../../common/CommonUtils";
 import {Component} from "../uiruntime/Component";
 import {Constants} from "../../common/Constants";
 import {ReferenceData} from "../../datamodel/dto/ReferenceData";
-import ColumnModel = FreeJqGrid.ColumnModel;
 import FormatterOptions = FreeJqGrid.FormatterOptions;
+import ColumnModel = FreeJqGrid.ColumnModel;
 
 /**
  * 表体渲染接口,这个针对jqTable.
@@ -233,10 +233,10 @@ export class ServerRenderProvider implements TableRenderProvider {
                 if (node.children) {//目前只做二层
                     this.groupHeader.groupHeaders.push(this.createGroupHeader(node));
                     for (let subNode of node.children) {
-                        await this.createColModel(subNode.data, this.lstColumn);
+                        await ServerRenderProvider.createColModel(subNode.data, this.lstColumn);
                     }
                 } else {
-                    await this.createColModel(component, this.lstColumn);
+                    await ServerRenderProvider.createColModel(component, this.lstColumn);
                 }
             }
             if (this.lstExtCol) {
@@ -273,7 +273,7 @@ export class ServerRenderProvider implements TableRenderProvider {
         }
     }
 
-    private async createColModel(com: Component, lstColumn) {
+    public static async createColModel(com: Component, lstColumn) {
 
         let options: ColumnModel = {
             name: com.column.getColumnDto().fieldName,
@@ -290,11 +290,12 @@ export class ServerRenderProvider implements TableRenderProvider {
         };
         if (com.getComponentDto().hideInTable == 1 ||
             com.getComponentDto().dispType == Constants.ComponentType.hidden) {
-            options.hidden=true;
+            options.hidden = true;
         }
         if (Constants.ComponentType.checkbox == com.getComponentDto().dispType) {
             options.formatter = "checkbox";
             options.edittype = "checkbox";
+            options.formatoptions = {"value": "1:0"};
             options.align = "center";
         } else if (Constants.ComponentType.select == com.getComponentDto().dispType) {
             options.formatter = "select";
@@ -308,7 +309,7 @@ export class ServerRenderProvider implements TableRenderProvider {
         lstColumn.push(options);
     }
 
-    private getSearchEditorInfo(com: Component) {
+    private static getSearchEditorInfo(com: Component) {
         if (com.isNumberField()) {
             return {sopt: ['eq', 'ne', 'le', 'lt', 'gt', 'ge']};
         } else {
@@ -335,7 +336,8 @@ export class ServerRenderProvider implements TableRenderProvider {
                 }
                 table.fireEvent(Constants.GeneralEventType.EVENT_DBL_CLICK, table.getRowData(rowid), table);
             };
-            this.tableOption.url = ServerRenderProvider.ServerDataUrl + "/" + this.blockId;
+            this.tableOption.url = (this.customOptions&&this.customOptions.url) ? CommonUtils.getServerUrl(this.customOptions.url)
+                : ServerRenderProvider.ServerDataUrl + "/" + this.blockId;
             this.tableOption.datatype = "json";
             let blockId = this.blockId;
             let that = this;
@@ -413,6 +415,12 @@ export class LocalRenderProvider extends ServerRenderProvider {
 
 }
 
+export class FixRowServerRenderProvider extends ServerRenderProvider {
+    protected async findViewerInfo(blockId) {
+        this.viewer = await UiService.getSchemaViewer(blockId) as any;
+    }
+}
+
 export interface ExtFilterProvider {
     getExtFilter(source: object, oldFilter: object): object;
 }
@@ -461,6 +469,10 @@ let DEFAULT_TABLE_CONFIG: FreeJqGrid.JqGridOptions = {
             repeatitems: true,
             cell: "cell"
         }
+    },
+    prmNames: {
+        id: Table.ID_FIELD,
+        subgridid: Table.ID_FIELD,
     }
 
 

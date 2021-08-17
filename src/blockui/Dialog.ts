@@ -167,6 +167,8 @@ export class Dialog<T extends DialogInfo> extends BaseUI<T> {
                 if (this.properties.onOk(this.getValue())) {
                     this.close();
                 }
+            } else {
+                this.close();
             }
         });
         $element.find(Dialog.CLOSE_BUTTON_SELECTOR).on("click", () => {
