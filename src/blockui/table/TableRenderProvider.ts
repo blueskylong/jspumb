@@ -81,7 +81,7 @@ export interface TableRenderProvider {
 
 export class ServerRenderProvider implements TableRenderProvider {
 
-    static ServerDataUrl = CommonUtils.getServerUrl("/dmdata/findBlockData");
+    static ServerDataUrl = null;
     static $label = $("<label></label>");
     /**
      * 是否可以编辑
@@ -103,6 +103,14 @@ export class ServerRenderProvider implements TableRenderProvider {
 
     setLstExtCol(lstColModel: Array<ColumnModel>) {
         this.lstExtCol = lstColModel;
+    }
+
+    public getDefaultUrl() {
+        if (!ServerRenderProvider.ServerDataUrl) {
+            ServerRenderProvider.ServerDataUrl = CommonUtils.getServerUrl("/dmdata/findBlockData");
+        }
+
+        return ServerRenderProvider.ServerDataUrl;
     }
 
     /**
@@ -274,12 +282,11 @@ export class ServerRenderProvider implements TableRenderProvider {
     }
 
     public static async createColModel(com: Component, lstColumn) {
-
         let options: ColumnModel = {
             name: com.column.getColumnDto().fieldName,
             index: com.column.getColumnDto().fieldName,
             width: com.componentDto.width ? com.componentDto.width : 200,
-            search: typeof com.componentDto.showSearch === "undefined" || com.componentDto.showSearch == null || !!com.componentDto.showSearch,
+            search: typeof com.componentDto.showSearch === "undefined" || com.componentDto.showSearch == null || com.componentDto.showSearch === 1,
             searchoptions: this.getSearchEditorInfo(com),
             align: com.getTextAlign(),
             label: com.componentDto.title,
@@ -336,8 +343,8 @@ export class ServerRenderProvider implements TableRenderProvider {
                 }
                 table.fireEvent(Constants.GeneralEventType.EVENT_DBL_CLICK, table.getRowData(rowid), table);
             };
-            this.tableOption.url = (this.customOptions&&this.customOptions.url) ? CommonUtils.getServerUrl(this.customOptions.url)
-                : ServerRenderProvider.ServerDataUrl + "/" + this.blockId;
+            this.tableOption.url = (this.customOptions && this.customOptions.url) ? CommonUtils.getServerUrl(this.customOptions.url)
+                : this.getDefaultUrl() + "/" + this.blockId;
             this.tableOption.datatype = "json";
             let blockId = this.blockId;
             let that = this;
@@ -398,7 +405,9 @@ export class LocalRenderProvider extends ServerRenderProvider {
     async getOptions(table: Table): Promise<FreeJqGrid.JqGridOptions> {
         if (!this.tableOption) {
             await this.init();
-            this.tableOption = $.extend(true, {}, DEFAULT_TABLE_CONFIG, this.customOptions || {});
+            this.tableOption = $.extend(true, {}, DEFAULT_TABLE_CONFIG, this.customOptions || {}, {rowNum: -1});
+            delete this.tableOption.rowNum;
+            delete this.tableOption.rowList;
             this.tableOption.ondblClickRow = (rowid: string, iRow: number, iCol: number, eventObject: JQueryEventObject) => {
                 table.fireEvent(Constants.GeneralEventType.EVENT_DBL_CLICK, table.getRowData(rowid), table);
             };
@@ -453,6 +462,7 @@ let DEFAULT_TABLE_CONFIG: FreeJqGrid.JqGridOptions = {
     // frozenColumns: true,
     pager: ".xx",//这里只是临时使用
     colModel: [],
+    toolbar : [ true, "top" ],
     cellEdit: true,
     ajaxGridOptions: {xhrFields: {withCredentials: true}},
     jsonReader: {

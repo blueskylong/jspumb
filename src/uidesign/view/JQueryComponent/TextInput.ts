@@ -52,6 +52,9 @@ export class TextInput<T extends Component> extends JQBaseComponent<T> {
             return;
         }
         //设置高度和宽度
+        if (!this.properties.componentDto.horSpan) {
+            this.properties.componentDto.horSpan = 12;
+        }
         if (this.properties.componentDto.horSpan <= 12) {//小于12.表示用bootstrap的列布局
             $dom.addClass("col-md-" + this.properties.componentDto.horSpan);
         } else if (this.properties.componentDto.horSpan > 12) {//大于12 ,则直接使用像素

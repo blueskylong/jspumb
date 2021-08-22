@@ -312,7 +312,6 @@ export class ManagedTable extends Table implements AutoManagedUI {
             this.hideOperatorCol();
             return;
         }
-        this.showOperatorCol();
         let btns = ManagedUITools.findRelationButtons(buttons, this.dsIds[0], false);
         if (!btns || btns.length == 0) {
             return;

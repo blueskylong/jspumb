@@ -27,6 +27,7 @@ import {GeneralEventListener} from "../../blockui/event/GeneralEventListener";
 import {DmConstants} from "../../datamodel/DmConstants";
 import {Logger} from "../../common/Logger";
 import {UiUtils} from "../../common/UiUtils";
+import {SchemaFactory} from "../../datamodel/SchemaFactory";
 
 
 export default class SchemaView extends DmDesignBaseView<SchemaDto> implements AttrChangeListener {
@@ -68,6 +69,8 @@ export default class SchemaView extends DmDesignBaseView<SchemaDto> implements A
     private beforeSave: (schema: Schema) => boolean;
     private afterSave: () => void;
 
+    private updating = false;
+
     constructor(dto: SchemaDto) {
         super(dto);
         this.relationDlg =
@@ -82,7 +85,7 @@ export default class SchemaView extends DmDesignBaseView<SchemaDto> implements A
             title: "请选择要增加的表", onOk: (value) => {
                 return this.onSelectTable(value);
             },
-            destroyOnClose:false
+            destroyOnClose: false
         });
     }
 
@@ -203,7 +206,7 @@ export default class SchemaView extends DmDesignBaseView<SchemaDto> implements A
             this.schema.setLstRelation(this.getRelations());
             DmDesignService.saveSchema(this.schema, (err) => {
                 if (err) {
-                    alert(err);
+                    Alert.showMessage(JSON.stringify(err.err));
                 } else {
                     if (this.afterSave) {
                         this.afterSave();
@@ -356,12 +359,21 @@ export default class SchemaView extends DmDesignBaseView<SchemaDto> implements A
     }
 
     refresh(schemaDto?: SchemaDto) {
-        if (schemaDto) {
-            this.properties = schemaDto;
-        }
-        this.destroyElement();
-        this.getJsplumb().reset(true);
-        this.initTableAndRelation();
+        CommonUtils.readyDo(() => {
+            return !this.updating && SchemaFactory.isLoadReady();
+        }, () => {
+            this.updating = true;
+            try {
+                if (schemaDto) {
+                    this.properties = schemaDto;
+                }
+                this.destroyElement();
+                this.getJsplumb().reset(true);
+                this.initTableAndRelation();
+            } finally {
+                this.updating = false;
+            }
+        })
 
     }
 

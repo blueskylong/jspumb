@@ -49,4 +49,6 @@ export default class TableDto extends BaseDto {
      */
     public blockViewId: number;
 
+    public isFixrow:number;
+
 }

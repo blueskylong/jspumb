@@ -24,23 +24,14 @@ $.getJSON('./config.json', function (r) {
         baseURL: r.baseURL,
         withCredentials: true
     });
+    $(() => {
+        App.setHomePage(BlockedHomePage);
+        new App().start();
+    });
+
 });
 
 
-$(() => {
-    App.setHomePage(BlockedHomePage);
-    new App().start();
-
-
-    // let dmDesign = new DmDesign();
-    // dmDesign.start($("#container").get(0));
-    // let dto = new BlockViewDto();
-    // dto.blockViewId = 20;
-    // dto.versionCode = "000000";
-    // let form = new Form(dto);
-    // $("#container").append(form.getViewUI());
-    // form.afterComponentAssemble();
-});
 
 
 

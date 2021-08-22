@@ -1,0 +1,87 @@
+body {
+  >.ngs-celleditor {
+    font-size: 14px;
+    position: absolute;
+    background-color: white;
+
+    &.box-shadow {
+      border: 1px solid #c2cad8;
+      border-radius: 0 0 4px 4px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+      box-sizing: border-box;
+      direction: ltr;
+    }
+
+    >input.input {
+      width: 100%;
+      height: 100%;
+      border: 1px solid #5292F7;
+    }
+
+    >div.input {
+      width: auto;
+      height: auto;
+      overflow: auto;
+      background-color: white;
+      border: 1px solid #5292F7;
+    }
+
+    >a.inverse {
+      float: right;
+      padding: 0 5px;
+      margin: 3px;
+    }
+
+    >input.search {
+      height: auto;
+      width: 100%;
+      border: 0;
+      border-bottom: 1px solid #f0f0f0;
+      border-radius: 2px 2px 0 0
+    }
+
+    .jstree-disabled .jstree-checkbox {
+      display: none;
+    }
+
+    .cell-fileuploader {
+      td, th {
+        word-break: break-all;
+        word-wrap: break-word;
+        //white-space: nowrap;
+        //overflow: hidden;
+        //text-overflow: ellipsis;
+        border: 1px solid #ddd;
+        text-align: center;
+        padding: 6px;
+      }
+
+      th>a {
+        margin: 0 6px;
+      }
+    }
+  }
+
+  .btn-file {
+    position: relative;
+    overflow: hidden;
+    vertical-align: middle;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    min-width: 80px;
+  }
+
+  .btn-file>input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-size: 23px;
+    cursor: pointer;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    direction: ltr;
+  }
+}

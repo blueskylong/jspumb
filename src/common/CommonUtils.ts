@@ -9,6 +9,7 @@ import {HandleResult} from "./HandleResult";
 import {StringMap} from "./StringMap";
 import {GlobalParams} from "./GlobalParams";
 import {UiUtils} from "./UiUtils";
+import {NetRequest} from "./NetRequest";
 
 export class CommonUtils {
     static ID_SER = -1;
@@ -125,7 +126,8 @@ export class CommonUtils {
     }
 
     static getServerUrl(subUrl) {
-        return "http://localhost:8080/" + (subUrl.indexOf("/") == 0 ? subUrl.substr(1) : subUrl);
+        let baseUtils: string = CommonUtils.getConfigParam("baseURL");
+        return CommonUtils.getConfigParam("baseURL") + (baseUtils.endsWith('/') && subUrl.indexOf("/") == 0 ? subUrl.substr(1) : subUrl);
     }
 
     static readyDo(isReady: () => boolean, callback: () => void, tryTimes?) {
@@ -268,7 +270,7 @@ export class CommonUtils {
     }
 
     static getDialogFullSize() {
-        return [document.body.clientWidth-200, document.body.clientHeight - 210];
+        return [document.body.clientWidth - 200, document.body.clientHeight - 210];
     }
 
     /**

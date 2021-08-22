@@ -209,6 +209,9 @@ export default class TableView extends DmDesignBaseView<TableInfo> implements At
 
     adjustProfile() {
         if (this.properties.getTableDto().posTop) {
+            if (this.properties.getTableDto().posTop < 0) {
+                this.properties.getTableDto().posTop = 0;
+            }
             this.$element.css("top", this.properties.getTableDto().posTop)
         }
         if (this.properties.getTableDto().posLeft) {

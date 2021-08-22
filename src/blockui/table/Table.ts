@@ -5,12 +5,13 @@ import "./table.css";
 import {TableRenderProvider} from "./TableRenderProvider";
 import {GeneralEventListener} from "../event/GeneralEventListener";
 import {Constants} from "../../common/Constants";
-import {ButtonInfo} from "../../uidesign/view/JQueryComponent/Toolbar";
+import {ButtonInfo, ToolbarButton} from "../../uidesign/view/JQueryComponent/Toolbar";
 import {BaseComponent} from "../../uidesign/view/BaseComponent";
 import FormatterOptions = FreeJqGrid.FormatterOptions;
 import ColumnModel = FreeJqGrid.ColumnModel;
 import {UiUtils} from "../../common/UiUtils";
 import {DmConstants} from "../../datamodel/DmConstants";
+import BodyTable = FreeJqGrid.BodyTable;
 
 
 export class Table extends BaseComponent<TableRenderProvider> {
@@ -39,6 +40,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
     private colBtns: Array<ButtonInfo>;
     private toolBtns: Array<ButtonInfo>;
     private lastRowId = null;
+    private gridId = CommonUtils.genUUID();
 
     private jqOptions: FreeJqGrid.JqGridOptions;
 
@@ -64,7 +66,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
     }
 
     setMultiSelect(isMulti) {
-        // this.$element.setGridParam({multiselect: isMulti}, true);
+        this.$element.setGridParam({multiselect: isMulti}, true);
         if (!isMulti) {
             this.$element.hideCol(Table.CHECK_COL_ID, {notSkipFrozen: true});
         } else {
@@ -76,8 +78,8 @@ export class Table extends BaseComponent<TableRenderProvider> {
         this.addListener(Table.EVENT_UI_READY, listener);
     }
 
-    isMultiSelect() {
-        this.$element.getGridParam("multiselect");
+    isMultiSelect(): boolean {
+        return this.$element.getGridParam("multiselect");
     }
 
     private removeNavHandler() {
@@ -264,6 +266,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
             this.$element.addRowData(CommonUtils.genUUID(), data);
         }
         this.updateButtonEvent();
+
     }
 
     addRow(rowData: any, rowId?: string, position?: FreeJqGrid.AddRowDataPosition) {
@@ -543,13 +546,15 @@ export class Table extends BaseComponent<TableRenderProvider> {
             let height = UiUtils.getAutoFitHeight(this.$fullElement.get(0));
             if (height > 110) {
                 //如果有兄弟，则还要减去兄弟的
-                this.$element.setGridHeight((height - 110) + 'px');
+                this.$element.setGridHeight((height - 130) + 'px');
             }
         }
     }
 
     protected createUI(): HTMLElement {
         let $ele = $(require("../template/Table.html"));
+
+        $ele.find(".jq-table").attr("id", this.gridId);
         $ele.find(".jq-pager").attr("id", this.getPagerId());
         this.$fullElement = $ele;
         return $ele.get(0);
@@ -602,13 +607,14 @@ export class Table extends BaseComponent<TableRenderProvider> {
         return result;
     }
 
-    showSearch(isShow) {
+    private setSearchOptions() {
         this.$element.filterToolbar({
             searchOnEnter: false,
             enableClear: true,
             stringResult: true,
-            searchOperators: isShow
-        });
+            searchOperators: true
+        })
+        ;
     }
 
     setColOperatorButtons(btns: Array<ButtonInfo>) {
@@ -619,22 +625,20 @@ export class Table extends BaseComponent<TableRenderProvider> {
             });
             this.$element.setColWidth(2, btns.length * 30, false);
             this.showOperatorCol();
+        } else {
+            this.hideOperatorCol();
         }
     }
 
     setToolbarButton(btns: Array<ButtonInfo>) {
         if (btns && btns.length > 0) {
             this.toolBtns = btns;
+            let toolbar = this.$fullElement.find('#t_' + this.gridId);
+            toolbar.addClass("btn-toolbar")
+                .addClass("panel-tools");
             for (let btn of btns) {
-                this.$element.navButtonAdd('#' + this.getPagerId(), {
-                    caption: btn.text,
-                    buttonicon: btn.iconClass || "glyphicon-plus",
-                    onClickButton: (event) => {
-                        btn.clickHandler(event as any);
-                    },
-                    iconsOverText: true
-                })
-                ;
+                toolbar.append(new ToolbarButton(btn).getViewUI());
+
             }
         }
     }
@@ -689,7 +693,7 @@ export class Table extends BaseComponent<TableRenderProvider> {
             this.setMultiSelect(false);
         }
         if (!option.hideSearch) {
-            this.showSearch(true);
+            this.setSearchOptions();
         }
 
         this.hideOperatorCol();
@@ -726,11 +730,18 @@ export class Table extends BaseComponent<TableRenderProvider> {
      * 这里不做任何事情
      */
     afterComponentAssemble(): void {
-
+        setTimeout(() => {
+            this.$element["sortableColumns"](this.$fullElement.find("tr.ui-jqgrid-labels"))
+        }, 1000)
     }
 
     public getJqTable() {
         return this.$element;
+    }
+
+    public clearSelection() {
+        let jqGridRowid;
+        this.$element.trigger("reloadGrid");
     }
 
     destroy(): boolean {

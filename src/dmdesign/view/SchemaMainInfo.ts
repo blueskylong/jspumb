@@ -135,7 +135,7 @@ export class SchemaMainInfo extends BorderLayout<BorderLayoutProperty> {
     }
 
     afterComponentAssemble(): void {
-        this.schemaTree.selectNodeById(3);//默认选择用户方案
+        // this.schemaTree.selectNodeById(3);//默认选择用户方案
         super.afterComponentAssemble();
     }
 

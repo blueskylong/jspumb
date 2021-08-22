@@ -27,7 +27,7 @@ import {StringMap} from "../common/StringMap";
 import {GlobalParams} from "../common/GlobalParams";
 
 @CustomUi("FixDataTable")
-export class FixDataTable<T extends PageDetailDto> extends BaseAutoManagedUI<T> implements AutoManagedUI {
+export class FixDataTable<T extends PageDetailDto> extends BaseAutoManagedUI<T> {
     private table: Table;
     private tableBody: TableBodyPanel;
     private lstUseBtn = new Array<MenuButtonDto>();
@@ -68,8 +68,8 @@ export class FixDataTable<T extends PageDetailDto> extends BaseAutoManagedUI<T> 
     btnClicked(source: any, buttonInfo: MenuButtonDto, data): boolean {
         if (buttonInfo.relationTableid === this.properties.relationDs
             && buttonInfo.tableOpertype === Constants.DsOperatorType.saveMulti) {
-            FixRowService.saveFixData(this.properties.relationDs, this.getMasterDsId(),
-                this.fixId, this.table.getData(true), (result) => {
+            FixRowService.saveFixData(this.fixId,
+                this.table.getData(true), (result) => {
                     if (result.success) {
                         Alert.showMessage("保存成功");
                         this.updateTableData();
@@ -108,6 +108,7 @@ export class FixDataTable<T extends PageDetailDto> extends BaseAutoManagedUI<T> 
 
         let param = JSON.parse(this.properties.customParam);
         this.tree = TreeUI.getTreeInstance(param["treeUIId"]);
+
         //
         this.layout.addComponent(BorderLayout.west, this.tree);
 
@@ -116,6 +117,18 @@ export class FixDataTable<T extends PageDetailDto> extends BaseAutoManagedUI<T> 
         this.$element.append(this.layout.getViewUI());
         this.layout.show();
 
+    }
+
+    protected initEvent() {
+        this.tree.addSelectionListener({
+            handleEvent: (eventType: string, data: any, source: any, extObject?: any) => {
+                if (data && data["data_id"]) {
+                    this.table.locateRow("data_id", data["data_id"]);
+                } else {
+                    this.table.clearSelection();
+                }
+            }
+        });
     }
 
     private findNextSub(parentCode: string): string {
@@ -311,12 +324,20 @@ export class FixDataTable<T extends PageDetailDto> extends BaseAutoManagedUI<T> 
         }
     }
 
+    private clearSearchOption(viewer: BlockViewer) {
+        let allComponentDto = viewer.getAllComponentDto();
+        allComponentDto.forEach(compDto => {
+            compDto.showSearch = 0;
+        })
+    }
+
     private updateTable(fixId) {
         if (this.table) {
             this.table.destroy();
         }
         FixRowService.findFixRowComponents(fixId, (result) => {
             this.viewer = BeanFactory.populateBean(BlockViewer, result.data);
+            // this.clearSearchOption(this.viewer);
             this.table = new Table(new LocalRenderProvider(this.viewer));
             this.tableBody.setTable(this.table.getViewUI());
             UiUtils.addAutoHeightFit(this.table.getViewUI());
@@ -371,7 +392,7 @@ export class FixDataTable<T extends PageDetailDto> extends BaseAutoManagedUI<T> 
     }
 
     private updateTableData() {
-        FixRowService.findFixData(this.properties.relationDs, this.getMasterDsId(), this.fixId, (result) => {
+        FixRowService.findFixData(this.fixId, (result) => {
             this.table.setData(result.data);
             this.tree.setValue(result.data);
         })

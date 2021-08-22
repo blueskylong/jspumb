@@ -145,6 +145,8 @@ export class ToolbarButton<T extends ButtonInfo> extends BaseUI<T> {
         }
         if (this.properties.iconClass) {
             $dom.find(".button-icon").addClass(this.properties.iconClass);
+        }else{
+            $dom.find(".button-icon").addClass("fa fa-user")
         }
         if (this.properties.clickHandler) {
             $dom.on("click", (event) => {

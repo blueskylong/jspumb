@@ -8,6 +8,7 @@ import {BaseComponent} from "../../uidesign/view/BaseComponent";
 import {Component} from "../uiruntime/Component";
 import {Constants} from "../../common/Constants";
 import {UiUtils} from "../../common/UiUtils";
+import {GeneralEventListener} from "../event/GeneralEventListener";
 
 /**
  * 设计生成的树
@@ -21,7 +22,7 @@ export class TreeUI<T extends BlockViewDto> extends BaseComponent<T> {
     private canLoadData = false;
     protected extFilter = {};
     protected treeInfo: JsTreeInfo;
-    protected hasCodeField:boolean;
+    protected hasCodeField: boolean;
 
     protected lstOnceReady: Array<() => void> = new Array<() => void>();
 
@@ -92,9 +93,9 @@ export class TreeUI<T extends BlockViewDto> extends BaseComponent<T> {
         component = this.findCompByTreeType(Constants.TreeRole.codeField, lstComponent);
         if (!component) {
             console.log("TreeUI--->没有指定树结构的编码字段");
-            this.hasCodeField =false;
+            this.hasCodeField = false;
         } else {
-            this.hasCodeField =true;
+            this.hasCodeField = true;
             treeInfo.codeField = component.getColumn().getColumnDto().fieldName;
         }
         component = this.findCompByTreeType(Constants.TreeRole.nameField, lstComponent);
@@ -142,6 +143,15 @@ export class TreeUI<T extends BlockViewDto> extends BaseComponent<T> {
             this.lstOnceReady.push(onReady);
         }
         this.jsTree.reload();
+
+    }
+
+    addSelectionListener(listener: GeneralEventListener) {
+        CommonUtils.readyDo(() => {
+            return !!this.jsTree;
+        }, () => {
+            this.jsTree.addSelectListener(listener);
+        })
 
     }
 

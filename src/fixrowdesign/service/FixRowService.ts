@@ -19,13 +19,13 @@ export class FixRowService {
      * @param rows
      * @param callback
      */
-    static saveFixData(dsId, masterDsId, masterKey, rows, callback: (result) => void) {
-        CommonUtils.handleResponse(NetRequest.axios.post("/dmdata/saveSlaveRows/"
-            + dsId + "/" + masterDsId + "/" + masterKey, rows), callback);
+    static saveFixData(fixId, rows, callback: (result) => void) {
+        CommonUtils.handleResponse(NetRequest.axios.post("/fixrow/saveFixData/"
+            + fixId, rows), callback);
     }
 
-    static findFixData(dsId, masterDsId, masterKey, callback: (result) => void) {
-        CommonUtils.handleResponse(NetRequest.axios.get("/dmdata/findSlaveRows/"
-            + dsId + "/" + masterDsId + "/" + masterKey), callback);
+    static findFixData(fixId, callback: (result) => void) {
+        CommonUtils.handleResponse(NetRequest.axios.get("/fixrow/findFixData/"
+            + fixId), callback);
     }
 }

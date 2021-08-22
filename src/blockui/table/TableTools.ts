@@ -233,6 +233,124 @@ export class TableTools {
             .find('>.ngs-celleditor');
     };
 
+    /**
+     * 数字格式化
+     * @param value
+     * @param format 格式 #、#,###.#0、000000 ￥#,###.#0
+     * @returns {any}
+     */
+    static formatNumber = (value, format: string): string => {
+        if (!(_.isNumber(value) && !_.isNaN(value)) && !(_.isString(value) && value && /^(-?\d*)(\.\d+)?$/.test(value))) {
+            return null;
+        }
+        if (_.isString(value) && /^(-?)(\.\d+)?$/.test(value)) {
+            value = value.replace(/\./, '0.');
+        }
+        const patterns = /(#|0|,)+\.?(#|0|,)*/.exec(format);
+        if (patterns) {
+            // 分整数部分处理和小数本分处理
+            let [int_fmt, dec_fmt] = patterns[0].split('.');
+            let [int_val, dec_val] = value.toString().split('.');
+            let int_res = '', dec_res = '';
+            /*
+             整数部分处理
+             */
+            // 处理负数，先去掉‘-’号，处理完再添加
+            const negative = int_val.indexOf('-') === 0;
+            if (negative) {
+                int_val = int_val.replace(/^-/, '');
+            }
+            // 去除0
+            int_val = int_val.replace(/^0+/, '').replace(/^\./, '0.') || '0';
+            // 将0之后的#变为0
+            let zeroIndex = int_fmt.indexOf('0');
+            if (zeroIndex >= 0) {
+                int_fmt = int_fmt.substring(0, zeroIndex) + int_fmt.substring(zeroIndex).replace(/#/g, '0');
+            }
+            // 将int_fmt补全到int_val对应长度
+            let dif = int_val.length - int_fmt.replace(/,/g, '').length;
+            if (dif > 0) {
+                let comma_split = int_fmt.split(','), comma_digit = 0, comma = comma_split.length > 1;
+                if (comma) {
+                    comma_digit = Math.max(comma_split[0].length, comma_split[1].length);
+                }
+                for (let i = 0, j = int_fmt.indexOf(','); i < dif; i++) {
+                    if (comma && j >= comma_digit) {
+                        int_fmt = ',' + int_fmt;
+                        j = 0;
+                    }
+                    int_fmt = '#' + int_fmt;
+                    if (comma) {
+                        j++;
+                    }
+                }
+            }
+            // 替换处理
+            const int_fmt_arr = int_fmt.split(''), int_val_arr = int_val.split(''), int_fmt_len = int_fmt.length,
+                int_val_len = int_val.length;
+            for (let i = 0, j = 0; i < int_fmt_len; i++) {
+                switch (int_fmt_arr[int_fmt_len - 1 - i]) {
+                    case '#':
+                        if (int_val_len - j > 0) {
+                            int_res = int_val_arr[int_val_len - 1 - j] + int_res;
+                            j++;
+                        }
+                        break;
+                    case '0':
+                        if (int_val_len - j > 0) {
+                            int_res = int_val_arr[int_val_len - 1 - j] + int_res;
+                            j++;
+                        } else {
+                            int_res = '0' + int_res;
+                        }
+                        break;
+                    case ',':
+                        int_res = ',' + int_res;
+                        break;
+                }
+            }
+            int_res = int_res.replace(/^,+/, '');
+            if (negative) {
+                int_res = '-' + int_res;
+            }
+            if (dec_fmt) {
+                // 小数部分0之前的#变为0
+                let zeroLastIndex = dec_fmt.lastIndexOf('0');
+                if (zeroLastIndex <= dec_fmt.length) {
+                    dec_fmt = dec_fmt.substring(0, zeroLastIndex).replace(/#/g, '0') + dec_fmt.substring(zeroLastIndex);
+                }
+                dec_val = dec_val || '';
+                const dec_fmt_arr = dec_fmt.split(''), dec_val_arr = dec_val.split(''), dec_fmt_len = dec_fmt.length,
+                    dec_val_len = dec_val.length;
+                for (let i = 0, j = 0; i < dec_fmt_len; i++) {
+                    switch (dec_fmt_arr[i]) {
+                        case '#':
+                            if (j < dec_val_len) {
+                                dec_res += dec_val_arr[j];
+                                j++;
+                            }
+                            break;
+                        case '0':
+                            if (j < dec_val_len) {
+                                dec_res += dec_val_arr[j];
+                                j++;
+                            } else {
+                                dec_res += '0';
+                            }
+                            break;
+                        case ',':
+                            dec_res += ',';
+                            break;
+                    }
+                }
+                dec_res = dec_res.replace(/,+$/, '');
+            }
+            return format.replace(patterns[0], int_res + (dec_res ? '.' + dec_res : ''));
+        } else {
+            return value.toString();
+        }
+    };
+
 }
 
 export interface CellTreeSelectConfig extends CellConfig {

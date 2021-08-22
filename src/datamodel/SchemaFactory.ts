@@ -193,6 +193,9 @@ export class SchemaFactory {
      */
     static getTablesRelation(tableId1, tableId2): TableColumnRelation {
         let lstRelation = SchemaFactory.getSchemaRelationsByTableId(tableId1);
+        if (!lstRelation) {
+            return null;
+        }
         for (let relation of lstRelation) {
             if ((relation.getTableTo().getTableDto().tableId == tableId1 && relation.getTableFrom().getTableDto().tableId == tableId2)
                 || (relation.getTableTo().getTableDto().tableId == tableId2 && relation.getTableFrom().getTableDto().tableId == tableId1)) {

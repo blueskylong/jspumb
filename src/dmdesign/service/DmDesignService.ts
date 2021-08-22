@@ -5,6 +5,7 @@ import {Schema} from "../../datamodel/DmRuntime/Schema";
 import {CommonUtils} from "../../common/CommonUtils";
 import {SchemaFactory} from "../../datamodel/SchemaFactory";
 import {GlobalParams} from "../../common/GlobalParams";
+import {HandleResult} from "../../common/HandleResult";
 
 
 export class DmDesignService {
@@ -40,9 +41,7 @@ export class DmDesignService {
         });
     }
 
-    static saveSchema(schema: Schema, callback?: (data: string) => void) {
-        console.log(schema);
-
+    static saveSchema(schema: Schema, callback?: (data: HandleResult) => void) {
         NetRequest.axios.post(DmDesignService.URL_ROOT + "/saveSchema", schema)
             .then((result) => {
                 if (callback) {

@@ -123,6 +123,18 @@ div.ui-jqgrid .selected-row td {
 .table td.ui-search-oper, .table td.ui-search-input, .table td.ui-search-clear {
     border: none;
 }
-.table .ui-jqgrid-bootstrap-corner-bottom{
+
+.table .ui-jqgrid-bootstrap-corner-bottom {
     background-color: #e5e5e5;
+}
+
+.ui-jqgrid .btn-toolbar {
+    position: relative;
+    border-radius: 0px;
+
+}
+
+.ui-jqgrid > .ui-jqgrid-view > .ui-userdata.btn-toolbar {
+    height: 40px;
+    background-color: white;
 }

@@ -281,15 +281,18 @@ export class Form extends BaseComponent<BlockViewDto> {
     }
 
     private updateSize() {
-        if (this.properties.colSpan) {
-            if (this.properties.colSpan <= 12) {
-                //使用bootstrap布局
-                this.$element.addClass("col-md-" + this.properties.colSpan);
-            } else {
-                this.$element.css("width", this.properties.colSpan);
-            }
-
+        if (!this.properties.colSpan) {
+            this.properties.colSpan = 12;
         }
+
+        if (this.properties.colSpan <= 12) {
+            //使用bootstrap布局
+            this.$element.addClass("col-md-" + this.properties.colSpan);
+        } else {
+            this.$element.css("width", this.properties.colSpan);
+        }
+
+
         if (this.properties.rowSpan) {
             this.$element.css("height", this.properties.rowSpan);
         }
